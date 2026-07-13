@@ -1,0 +1,14 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+@import './animations.css';
+
+@media (hover: hover) {
+  html, body, *, select, input, textarea {
+    cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cG9seWdvbiBwb2ludHM9IjAsMCAxNyw1IDEwLDkgNiwxNyIgZmlsbD0iIzNENkZDNCIgc3Ryb2tlPSIjMDgwZDE3IiBzdHJva2Utd2lkdGg9IjEuNSIvPjwvc3ZnPg==") 0 0, auto !important;
+  }
+  
+  a, button, [role="button"], iframe {
+    cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cG9seWdvbiBwb2ludHM9IjAsMCAxNyw1IDEwLDkgNiwxNyIgZmlsbD0iI2ZmZmZmZiIHN0cm9rZT0iIzNENkZDNDIiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==") 0 0, pointer !important;
+  }
+}
