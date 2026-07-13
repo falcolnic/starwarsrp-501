@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import { Link } from "react-router";
 import { ChevronDown, Users, TrendingUp } from "lucide-react";
-import { GlitchText } from "../components/GlitchText";
 
 import { useEntrance } from "../../hooks/useEntrance";
 import { useTypewriter } from "../../hooks/useTypewriter";
@@ -9,6 +8,7 @@ import { useTypewriter } from "../../hooks/useTypewriter";
 import { SectionDecor, CornerDecoration, HeroEmblem, InfoTicker } from "../components/ui/HomeDecorations";
 import { HudButton, AccordionTab, PlaceholderText } from "../components/ui/HomeComponents";
 import { homeTabs } from "../../data/homeTabs";
+import { GlitchText } from "../components/GlitchText";
 
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";
@@ -35,14 +35,16 @@ export function Home() {
       <section 
         ref={heroRef}
         onMouseMove={handleMouseMove}
-        className="group min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-20 px-6 pb-10 bg-[#080d17] md:bg-[url('/hero-bg.png')] bg-cover bg-center"
+        className="group min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-20 px-6 pb-10 bg-[#080d17]"
       >
+        <div className="hidden md:block absolute inset-0 pointer-events-none bg-[url('/hero-bg.png')] bg-cover bg-center opacity-90 brightness-110 contrast-105" />
+
         {/* Hidden on mobile, runs on desktop hover */}
         <div className="hidden md:block absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-screen bg-[radial-gradient(120px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(61,111,196,0.35)_0%,rgba(61,111,196,0.08)_50%,transparent_100%)]" />
 
         {/* Hidden on mobile */}
-        <div className="hidden md:block absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_20%,#080d17_95%)] opacity-85" />
-        <div className="hidden md:block absolute inset-0 bg-[#080d17]/40 pointer-events-none" />
+        <div className="hidden md:block absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_25%,#080d17_95%)] opacity-60" />
+        <div className="hidden md:block absolute inset-0 bg-[#080d17]/20 pointer-events-none" />
 
         {/* 3. VERTICAL SCAN LINES - Hidden on mobile to keep small screens clean */}
         <div className="hidden md:block absolute top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(61,111,196,0.2)] via-[rgba(61,111,196,0.5)_50%] via-[rgba(61,111,196,0.2)_70%] to-transparent left-[30%] animate-[scan-down_8s_linear_infinite] pointer-events-none opacity-30" />

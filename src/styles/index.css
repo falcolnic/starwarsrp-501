@@ -4,11 +4,14 @@
 @import './animations.css';
 
 @media (hover: hover) {
-  html, body, *, select, input, textarea {
-    cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cG9seWdvbiBwb2ludHM9IjAsMCAxNyw1IDEwLDkgNiwxNyIgZmlsbD0iIzNENkZDNCIgc3Ryb2tlPSIjMDgwZDE3IiBzdHJva2Utd2lkdGg9IjEuNSIvPjwvc3ZnPg==") 0 0, auto !important;
-  }
-  
-  a, button, [role="button"], iframe {
-    cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cG9seWdvbiBwb2ludHM9IjAsMCAxNyw1IDEwLDkgNiwxNyIgZmlsbD0iI2ZmZmZmZiIHN0cm9rZT0iIzNENkZDNDIiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==") 0 0, pointer !important;
-  }
+    /* 1. DEFAULT STATE: Blue Sci-Fi Arrow (Applies to background & non-interactive items) */
+    html, body, .cursor-default {
+        cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cG9seWdvbiBwb2ludHM9IjAsMCAxNyw1IDEwLDkgNiwxNyIgZmlsbD0iIzNENkZDNCIgc3Ryb2tlPSIjMDgwZDE3IiBzdHJva2Utd2lkdGg9IjEuNSIvPjwvc3ZnPg==") 0 0, auto !important;
+    }
+
+    /* 2. TEXT STATE: Blue I-Beam */
+    p, h1, h2, h3, h4, h5, h6, span, li, label, input, textarea, font {
+        cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDE2IDI0Ij48bGluZSB4MT0iOCIgeTE9IjQiIHgyPSI4IiB5Mj0iMjAiIHN0cm9rZT0iIzNENkZDNCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjQiIHkxPSI0IiB4Mj0iMTIiIHkyPSI0IiBzdHJva2U9IiMzRDZGQzQiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjQiIHkxPSIyMCIgeDI9IjEyIiB5Mj0iMjAiIHN0cm9rZT0iIzNENkZDNCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48L3N2Zz4=") 8 12, text !important;
+    }
+
 }
