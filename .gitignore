@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+/jspm_packages/
+
+# Vite build output
+dist/
+dist-ssr/
+*.local
+
+# Vercel deployment folder
+.vercel/
+
+# Logs
+*.log
+logs/
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+
+# Environment variables (Contains secret API keys)
+.env
+.env.local
+.env.*.local
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Editor folders and local history
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.history/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Windows system files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
