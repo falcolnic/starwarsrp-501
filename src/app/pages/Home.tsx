@@ -5,14 +5,15 @@ import { ChevronDown, Users, TrendingUp } from "lucide-react";
 import { useEntrance } from "../../hooks/useEntrance";
 import { useTypewriter } from "../../hooks/useTypewriter";
 
-import { SectionDecor, CornerDecoration, HeroEmblem, InfoTicker } from "../components/ui/HomeDecorations";
+import { SectionDecor, CornerDecoration, HeroEmblem } from "../components/ui/HomeDecorations";
 import { HudButton, AccordionTab, PlaceholderText } from "../components/ui/HomeComponents";
 import { homeTabs } from "../../data/homeTabs";
 import { GlitchText } from "../components/GlitchText";
+import { InfoTicker } from "../components/ui/InfoTicker";
 
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";
-  const { displayed, done } = useTypewriter(subtitleText, 32, 900);
+  const { displayed, done } = useTypewriter(subtitleText, 26, 900);
 
   const welcomeRef = useEntrance(0);
   const tabsLabelRef = useEntrance(0);
@@ -31,11 +32,10 @@ export function Home() {
 
   return (
     <div>
-      {/* ── HERO SECTION ─────────────────────────────────────────────────── */}
       <section 
         ref={heroRef}
         onMouseMove={handleMouseMove}
-        className="group min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-20 px-6 pb-10 bg-[#080d17]"
+        className="group min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6 bg-[#080d17]"
       >
         <div className="hidden md:block absolute inset-0 pointer-events-none bg-[url('/hero-bg.png')] bg-cover bg-center opacity-90 brightness-110 contrast-105" />
 
@@ -61,7 +61,7 @@ export function Home() {
           </div>
 
           <div className="anim-fade-up text-center max-w-4xl [animation-delay:150ms]">
-            <div className="anim-flicker font-mono text-xs tracking-widest text-[var(--primary)] mb-3">
+            <div className="anim-flicker font-mono text-base tracking-widest text-[var(--primary)] mb-3">
               ГАЛАКТИЧЕСКАЯ РЕСПУБЛИКА · ВЕЛИКАЯ АРМИЯ · СПЕЦИАЛЬНЫЕ ОПЕРАЦИИ
             </div>
 
@@ -78,52 +78,50 @@ export function Home() {
                 margin: "0 0 6px",
                 textShadow: "0 0 50px rgba(61,111,196,0.25)",
               }}
-              glitchInterval={6000}
+              glitchInterval={4000}
             />
 
             <div className="h-[2px] bg-gradient-to-r from-transparent via-[var(--primary)] via-[rgba(61,111,196,0.4)] via-[var(--primary)] to-transparent my-4 mx-auto max-w-xl shadow-[0_0_12px_rgba(61,111,196,0.4)]" />
 
-            <div className="font-[var(--font-display)] text-sm tracking-wider text-[var(--muted-foreground)] min-h-[1.5em]">
+            <div className="font-[var(--font-display)] text-base tracking-wider text-[var(--muted-foreground)] min-h-[1.5em]">
               {displayed}
               {!done && <span className="anim-blink border-r-2 border-[var(--primary)] ml-0.5">&nbsp;</span>}
             </div>
 
-            <div className="anim-flicker font-mono text-xs tracking-wider text-gray-500 mt-5">
+            <div className="anim-flicker font-mono text-sm tracking-wider text-gray-500 mt-5">
               ОБОЗНАЧЕНИЕ: GAR-501-EAL · ГРИФ: СЕКРЕТНО · ДОПУСК: TROOPER+
             </div>
           </div>
 
-          <div className="anim-fade-up flex gap-4 mt-12 flex-wrap justify-center [animation-delay:400ms]">
+          <div className="anim-fade-up flex gap-9 mt-12 flex-wrap justify-center [animation-delay:400ms]">
             <Link to="/roster" className="no-underline">
-              <HudButton icon={<Users size={16} />} label="БАЗА ДАННЫХ ЛИЧНОГО СОСТАВА" primary />
+              <HudButton icon={<Users size={24} />} label="БАЗА ДАННЫХ ЛИЧНОГО СОСТАВА" primary />
             </Link>
             <Link to="/promotion" className="no-underline">
-              <HudButton icon={<TrendingUp size={16} />} label="ТРЕКЕР ПОВЫШЕНИЙ" />
+              <HudButton icon={<TrendingUp size={24} />} label="ТРЕКЕР ПОВЫШЕНИЙ" />
             </Link>
           </div>
         </div>
 
-        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-30 z-10">
-          <div className="font-mono text-xs tracking-wider text-[var(--muted-foreground)]">ПРОКРУТИТЬ</div>
-          <ChevronDown size={13} className="anim-blink text-[var(--muted-foreground)]" />
+        <div className="pt-16 flex flex-col items-center gap-1 opacity-40 z-10">
+          <p className="font-mono text-lg tracking-wider text-[var(--muted-foreground)]">ПРОКРУТИТЬ</p>
+          <ChevronDown size={21} className="anim-blink text-[var(--muted-foreground)]" />
         </div>
       </section>
 
-      {/* ── TICKER ───────────────────────────────────────────────────────── */}
       <InfoTicker />
 
-      {/* ── MAIN CONTENT ─────────────────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto pt-0 px-6 pb-24">
+      <div className="max-w-6xl mx-auto pt-0 px-6 pb-24">
         <SectionDecor />
         <div ref={welcomeRef} className="mb-12 opacity-0">
-          <div className="font-mono text-xs tracking-widest text-[var(--primary)] mb-3">БРИФИНГ ПОДРАЗДЕЛЕНИЯ // ПРИВЕТСТВЕННОЕ СЛОВО</div>
+          <div className="font-mono text-base tracking-widest text-[var(--primary)] mb-3">БРИФИНГ ПОДРАЗДЕЛЕНИЯ // ПРИВЕТСТВЕННОЕ СЛОВО</div>
           <h2 className="m-0 mb-5">ДОБРО ПОЖАЛОВАТЬ В 501-Й</h2>
           <PlaceholderText lines={4} />
         </div>
 
         <SectionDecor />
         <div ref={tabsLabelRef} className="mb-4 opacity-0">
-          <div className="font-mono text-xs tracking-widest text-[var(--primary)] mb-3">ДОКУМЕНТАЦИЯ ПОДРАЗДЕЛЕНИЯ // НАЖМИТЕ ДЛЯ РАСКРЫТИЯ</div>
+          <div className="font-mono text-base tracking-widest text-[var(--primary)] mb-3">ДОКУМЕНТАЦИЯ ПОДРАЗДЕЛЕНИЯ // НАЖМИТЕ ДЛЯ РАСКРЫТИЯ</div>
           <h2 className="m-0 mb-5">СПРАВОЧНЫЕ МАТЕРИАЛЫ</h2>
         </div>
 

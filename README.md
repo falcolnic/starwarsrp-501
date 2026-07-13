@@ -10,7 +10,6 @@
   |-- default_shadcn_theme.css
   |-- index.html
   |-- package.json
-  |-- pnpm-workspace.yaml
   |-- postcss.config.mjs
   |-- README.md
   |-- vite.config.ts
@@ -23,11 +22,7 @@
     |   |   `-- ui/
     |   `-- pages/
     |-- data/
-    |   |-- map.json
-    |   `-- roster.json
     |-- services/
-    |   |-- botData.ts
-    |   `-- promotionRules.ts
     `-- styles/
       |-- animations.css
       |-- fonts.css

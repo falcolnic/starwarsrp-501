@@ -60,7 +60,6 @@ export function GlitchText({ text, className, style, tag: Tag = "div", glitchInt
           i++;
           timeout = setTimeout(tick, 55);
         } else {
-          // Schedule next burst
           timeout = setTimeout(runGlitch, glitchInterval + Math.random() * 2000);
         }
       };

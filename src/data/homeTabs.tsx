@@ -18,7 +18,7 @@ export const homeTabs = [
             <div className="border-l-2 border-[var(--primary)] pl-4 font-sans text-sm text-[var(--muted-foreground)] leading-relaxed italic">
             «Я, солдат Великой Армии Республики, торжественно клянусь отстаивать ценности 501-го Элитного Штурмового Легиона — стоять рядом с братьями на поле боя, следовать законным приказам с дисциплиной и целеустремлённостью, и чтить Республику каждым своим поступком на поле боя и за его пределами. Моя верность непоколебима. Моя решимость абсолютна.»
             </div>
-            <p className="font-mono text-xs text-gray-500">[ЗАГЛУШКА — КЛИЕНТ ПРЕДОСТАВИТ ФИНАЛЬНЫЙ ТЕКСТ КЛЯТВЫ]</p>
+            <p className="font-mono text-sm text-gray-500">[ЗАГЛУШКА — КЛИЕНТ ПРЕДОСТАВИТ ФИНАЛЬНЫЙ ТЕКСТ КЛЯТВЫ]</p>
         </div>
         ),
     },
@@ -37,7 +37,7 @@ export const homeTabs = [
             <div>HFN / ZHFN / FN — Полевой отдел</div>
             <div>CA — Прочее</div>
             </div>
-            <p className="font-mono text-xs text-gray-500">[ЗАГЛУШКА — ПРЕДОСТАВЬТЕ ПОЛНУЮ ДОКУМЕНТАЦИЮ ПО КОДИРОВКЕ]</p>
+            <p className="font-mono text-sm text-gray-500">[ЗАГЛУШКА — ПРЕДОСТАВЬТЕ ПОЛНУЮ ДОКУМЕНТАЦИЮ ПО КОДИРОВКЕ]</p>
         </div>
         ),
     },
@@ -57,7 +57,7 @@ export const homeTabs = [
             <div key={i} className="flex items-center gap-2 p-3 bg-slate-900/40 border border-[var(--border)] transition-colors hover:border-[var(--primary)]">
                 <FileText size={14} className="text-[var(--primary)] shrink-0" />
                 <span className="font-mono text-sm text-[var(--muted-foreground)] flex-1">{doc}</span>
-                <span className="font-mono text-xs text-gray-500">ЗАГЛУШКА</span>
+                <span className="font-mono text-sm text-gray-500">ЗАГЛУШКА</span>
             </div>
             ))}
         </div>
