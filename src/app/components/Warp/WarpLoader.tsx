@@ -22,6 +22,7 @@ const CONFIG = {
     maxDPR: 2,
     trailFade: 0.35,
     parallax: 0.05,
+    glowParallax: 1, // how much further the core/halo swings vs the star trails on mouse move
     starColor: "178, 204, 249",
 };
 
@@ -45,6 +46,7 @@ export function WarpLoader({ progress, minDuration = 3000, onDone }: WarpLoaderP
         cy: 0,
         speed: CONFIG.baseSpeed,
         target: CONFIG.baseSpeed,
+        glow: 0, // smoothed 0..1 value driving the core/halo glow
         stars: [] as Star[],
         raf: 0,
         startTime: 0,
@@ -134,6 +136,55 @@ export function WarpLoader({ progress, minDuration = 3000, onDone }: WarpLoaderP
             ctx.lineTo(sx, sy);
             ctx.stroke();
             }
+
+            // --- glowing core at the vanishing point ---
+            // 0 while cruising at warpSpeed, ramps toward 1 as speed approaches jumpSpeed
+            const targetGlowT = Math.max(
+                0,
+                Math.min(1, (st.speed - CONFIG.warpSpeed) / (CONFIG.jumpSpeed - CONFIG.warpSpeed))
+            );
+            // smooth glow independently (slower than speed) so its size doesn't jitter/track every frame
+            st.glow += (targetGlowT - st.glow) * 0.015;
+
+            if (st.glow > 0.001) {
+            const glowT = st.glow;
+
+            // glow gets its own amplified offset so it swings a bit more than the
+            // star trails with the mouse, independent of the subtler star parallax
+            const gcx = st.cx + st.ox * CONFIG.glowParallax;
+            const gcy = st.cy + st.oy * CONFIG.glowParallax;
+
+            // size as a % of the smaller screen dimension, so it can never wash out
+            // the whole canvas regardless of viewport size / DPR
+            const minDim = Math.min(st.W, st.H);
+            const R = minDim * (0.05 + glowT * 0.17);
+
+            ctx.globalCompositeOperation = "lighter";
+
+            // ONE continuous gradient instead of two separate circles.
+            // Stops are biased toward the center (t = (i/N)^1.8) so there's fine
+            // resolution near the core -> smooth hot center that melts into the
+            // halo with no seam/ring, then decays fully to 0 by the edge.
+            const glowGrad = ctx.createRadialGradient(gcx, gcy, 0, gcx, gcy, R);
+            const stops = 24;
+            for (let i = 0; i <= stops; i++) {
+                const t = Math.pow(i / stops, 1.8);
+                // color drifts from pure white at the core to a cool blue-white out at the edge
+                const r = Math.round(255 - 65 * t);
+                const g = Math.round(255 - 43 * t);
+                const b = 255;
+                const alpha = glowT * Math.pow(1 - t, 3.2) * 0.95;
+                glowGrad.addColorStop(t, `rgba(${r},${g},${b},${alpha})`);
+            }
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.arc(gcx, gcy, R, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.globalCompositeOperation = "source-over";
+            }
+            // --- end glow ---
+
             st.raf = requestAnimationFrame(frame);
         };
         st.raf = requestAnimationFrame(frame);
