@@ -11,20 +11,20 @@ export function Navbar() {
 
     return (
         <nav
-        className="sticky top-0 z-[15] border-b shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
+        className="sticky top-0 z-15 border-b shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
         style={{
             background: "linear-gradient(180deg, #080d17 0%, #0d1829 100%)",
         }}
         >
         <div className="max-w-full mx-auto px-8">
-            <div className="flex items-center justify-between h-[84px]">
+            <div className="flex items-center justify-between h-[70px]">
             <button
                 onClick={() => navigate("/")}
                 className="flex items-center gap-3 bg-transparent border-none cursor-pointer p-0"
             >
                 <Logo className="w-14 h-14" imgSize={76} divSize={76} />
                 <div>
-                    <div className="text-[2rem] font-bold leading-none tracking-[0.12em]"
+                    <div className="text-2xl font-bold leading-none tracking-[0.12em]"
                         style={{ fontFamily: "var(--font-display)", color: "var(--foreground)" }}
                     >
                         501ST ELITE ASSAULT LEGION
@@ -44,7 +44,7 @@ export function Navbar() {
                         to={link.to}
                         end={link.end}
                         className={({ isActive }) => 
-                            `h-[84px] flex items-center px-1 border-b-2 text-[0.85rem] font-medium tracking-[0.12em] uppercase transition-all duration-200 no-underline ${
+                            `h-[84px] flex items-center px-1 border-b-2 text-sm font-medium tracking-[0.12em] uppercase transition-all duration-200 no-underline ${
                                 isActive 
                                     ? "text-[var(--primary)] border-[var(--primary)] [text-shadow:0_0_8px_rgba(61,111,196,0.6)]" 
                                     : "text-[var(--muted-foreground)] border-transparent hover:text-[var(--foreground)]"

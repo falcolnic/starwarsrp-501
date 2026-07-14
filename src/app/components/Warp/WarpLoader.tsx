@@ -210,7 +210,7 @@ export function WarpLoader({ progress, minDuration = 3000, onDone }: WarpLoaderP
         aria-label="Loading"
         aria-live="polite"
         aria-valuenow={pct}
-        className={`fixed inset-0 z-[999] bg-black overflow-hidden transition-opacity duration-200 ease-out ${
+        className={`fixed inset-0 z-99 bg-black overflow-hidden transition-opacity duration-200 ease-out ${
             hidden ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
         >

@@ -81,7 +81,7 @@ export function MapSidebar({
                 className="text-red-400/70 hover:text-red-400 bg-transparent border-none cursor-pointer flex p-0.5"
                 title="Clear active tactical plans"
                 >
-                <Trash2 size={13} />
+                <Trash2 size={16} />
                 </button>
             )}
             </div>
@@ -117,7 +117,7 @@ export function MapSidebar({
                     onClick={() => removeMarker(m.id)}
                     className="opacity-0 group-hover:opacity-100 bg-transparent border-none text-red-400/50 hover:text-red-400 cursor-pointer p-0.5 transition-all duration-150 flex shrink-0 ml-2"
                     >
-                    <Trash2 size={12} />
+                    <Trash2 size={16} />
                     </button>
                 </div>
                 ))
