@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { Menu, X } from "lucide-react";
 import { Logo } from "../ui/Logo";
-import { NavLinks } from "./NavLinks";
+import { navLinks } from "./NavLinks";
 import { MobileMenu } from "./MobileMenu";
 
 export function Navbar() {
@@ -11,7 +11,7 @@ export function Navbar() {
 
     return (
         <nav
-        className="sticky top-0 z-[2] border-b shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
+        className="sticky top-0 z-[15] border-b shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
         style={{
             background: "linear-gradient(180deg, #080d17 0%, #0d1829 100%)",
         }}
@@ -37,7 +37,25 @@ export function Navbar() {
                 </div>
             </button>
 
-            <NavLinks />
+            <div className="hidden md:flex items-center gap-8 h-full">
+                {navLinks.map((link) => (
+                    <NavLink
+                        key={link.to}
+                        to={link.to}
+                        end={link.end}
+                        className={({ isActive }) => 
+                            `h-[84px] flex items-center px-1 border-b-2 text-[0.85rem] font-medium tracking-[0.12em] uppercase transition-all duration-200 no-underline ${
+                                isActive 
+                                    ? "text-[var(--primary)] border-[var(--primary)] [text-shadow:0_0_8px_rgba(61,111,196,0.6)]" 
+                                    : "text-[var(--muted-foreground)] border-transparent hover:text-[var(--foreground)]"
+                            }`
+                        }
+                        style={{ fontFamily: "var(--font-display)" }}
+                    >
+                        {link.label}
+                    </NavLink>
+                ))}
+            </div>
 
             <button
                 className="md:hidden bg-transparent border-none cursor-pointer p-1 flex"
