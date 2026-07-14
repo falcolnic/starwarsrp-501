@@ -3,7 +3,8 @@ import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
 import { Roster } from "./pages/Roster";
 import { Promotion } from "./pages/Promotion";
-import { WarpLoaderFallback } from "./components/Warp/WarpLoaderFallback";
+import { WarpLoaderFallback } from "./components/warp/WarpLoaderFallback";
+import { MapViewer } from "./components/map/MapViewer";
 
 const MIN_LOADER_DURATION = 8000;
 
@@ -28,17 +29,20 @@ export const router = createBrowserRouter([
       { index: true, Component: Home },
       { path: "roster", Component: Roster },
       { path: "promotion", Component: Promotion },
+      { path: "map", Component: MapViewer },
       {
         path: "*",
         Component: () => (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: 16 }}>
-            <h2 style={{ color: "var(--primary)", margin: 0 }}>404 — SECTOR NOT FOUND</h2>
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: "0.82rem", color: "var(--muted-foreground)", margin: 0 }}>
+          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+            <h2 className="text-[var(--primary)] m-0 font-display text-2xl tracking-[0.12em]">
+              404 — SECTOR NOT FOUND
+            </h2>
+            <p className="font-mono text-[0.82rem] text-[var(--muted-foreground)] m-0">
               Navigation target does not exist in registry.
             </p>
             <a
               href="/"
-              style={{ color: "var(--primary)", fontFamily: "var(--font-display)", letterSpacing: "0.1em", fontSize: "0.88rem", border: "1px solid var(--primary)", padding: "8px 24px", textDecoration: "none" }}
+              className="text-[var(--primary)] font-display tracking-[0.1em] text-[0.88rem] border border-[var(--primary)] px-6 py-2 no-underline hover:bg-[var(--primary)]/10 transition-all duration-150"
             >
               ← RETURN TO BASE
             </a>

@@ -1,5 +1,5 @@
 import { FileText, Sword, Code2, Map, Archive, BookOpen } from "lucide-react";
-import { MapViewer } from "../app/components/MapViewer";
+import { MapViewer } from "../app/components/map/MapViewer";
 import { PlaceholderText } from "../app/components/ui/HomeComponents";
 
 export const homeTabs = [

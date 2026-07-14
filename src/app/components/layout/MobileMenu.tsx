@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import { ChevronRight } from "lucide-react";
-import { navLinks } from "./navLinks";
+import { navLinks } from "./NavLinks";
 
 interface MobileMenuProps {
     onLinkClick: () => void;

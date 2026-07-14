@@ -9,13 +9,12 @@ export function Logo({
 }) {
     return (
         <div
-            className={`relative ${className}`}
+            className={`flex items-center justify-center shrink-0 ${className}`}
             style={{ width: divSize, height: divSize }}
         >
             <img
-                src="/logo.svg"
+                src="/logo.png"
                 alt="Logo"
-                className="absolute inset-0 m-auto"
                 style={{ width: imgSize, height: imgSize }}
             />
             </div>
