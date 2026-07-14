@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { Menu, X } from "lucide-react";
 import { Logo } from "../ui/Logo";
-import { navLinks } from "./NavLinks";
+import { navLinks } from "./navLinks";
 import { MobileMenu } from "./MobileMenu";
 
 export function Navbar() {
@@ -44,7 +44,7 @@ export function Navbar() {
                         to={link.to}
                         end={link.end}
                         className={({ isActive }) => 
-                            `h-[84px] flex items-center px-1 border-b-2 text-sm font-medium tracking-[0.12em] uppercase transition-all duration-200 no-underline ${
+                            `h-[84px] flex items-center px-1 border-b-2 text-base font-medium tracking-[0.12em] uppercase transition-all duration-200 no-underline ${
                                 isActive 
                                     ? "text-[var(--primary)] border-[var(--primary)] [text-shadow:0_0_8px_rgba(61,111,196,0.6)]" 
                                     : "text-[var(--muted-foreground)] border-transparent hover:text-[var(--foreground)]"

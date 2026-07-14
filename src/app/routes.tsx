@@ -1,10 +1,15 @@
 import { createBrowserRouter } from "react-router";
 import { Layout } from "./components/Layout";
+import { WarpLoaderFallback } from "./components/warp/WarpLoaderFallback";
+
 import { Home } from "./pages/Home";
 import { Roster } from "./pages/Roster";
 import { Promotion } from "./pages/Promotion";
-import { WarpLoaderFallback } from "./components/warp/WarpLoaderFallback";
 import { MapViewer } from "./components/map/MapViewer";
+import { Zergs } from "./pages/Zergs";
+import { Droids } from "./pages/Droids";
+import { Equipment } from "./pages/Equipment";
+import { DatabaseLayout } from "./components/database/DatabaseLayout";
 
 const MIN_LOADER_DURATION = 8000;
 
@@ -30,6 +35,13 @@ export const router = createBrowserRouter([
       { path: "roster", Component: Roster },
       { path: "promotion", Component: Promotion },
       { path: "map", Component: MapViewer },
+      { Component: DatabaseLayout,
+        children: [
+          { path: "zergs", Component: Zergs },
+          { path: "droids", Component: Droids },
+          { path: "equipment", Component: Equipment },
+        ],
+      },
       {
         path: "*",
         Component: () => (
