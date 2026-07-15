@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router";
 import { ChevronDown, Users, TrendingUp } from "lucide-react";
 
@@ -10,6 +10,7 @@ import { HudButton, AccordionTab, PlaceholderText } from "../components/ui/HomeC
 import { homeTabs } from "../../data/homeTabs";
 import { GlitchText } from "../components/GlitchText";
 import { InfoTicker } from "../components/ui/InfoTicker";
+import { BlacklistModal } from "../components/BlackListModal";
 
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";
@@ -19,6 +20,8 @@ export function Home() {
   const tabsLabelRef = useEntrance(0);
 
   const heroRef = useRef<HTMLDivElement>(null);
+  
+  const [isBlacklistOpen, setIsBlacklistOpen] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!heroRef.current) return;
@@ -38,6 +41,22 @@ export function Home() {
         className="group min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6 bg-[#080d17]"
       >
         <div className="hidden md:block absolute inset-0 pointer-events-none bg-[url('/hero-bg.png')] bg-cover bg-center opacity-90 brightness-110 contrast-105" />
+
+        {/* ================= ИНТЕРАКТИВНАЯ ЗОНА ПАПКИ CONFIDENTIAL ================= */}
+        <div
+          onClick={() => setIsBlacklistOpen(true)}
+          className="hidden md:block absolute bottom-[5%] left-[1.5%] w-[16%] h-[26%] cursor-pointer group z-20"
+          title="СЕКРЕТНЫЕ АРХИВЫ // КЛИК ДЛЯ ДЕШИФРОВАНИЯ"
+        >
+          {/* Красная рамка со свечением при ховере */}
+          <div className="absolute inset-0 border border-transparent group-hover:border-red-500/40 group-hover:bg-red-500/5 rounded transition-all duration-300 shadow-[0_0_0px_rgba(239,68,68,0)] group-hover:shadow-[0_0_15px_rgba(239,68,68,0.15)]" />
+          
+          {/* Текст подсказки сверху папки */}
+          <div className="absolute -top-10 left-4 opacity-0 group-hover:opacity-100 bg-[#0d0707] border border-red-500/50 text-red-500 text-[10px] py-1 px-2.5 rounded uppercase font-mono tracking-wider transition-all duration-300 pointer-events-none whitespace-nowrap shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+            🚨 ACCESS RESTRICTED // LEVEL 3 🚨
+          </div>
+        </div>
+        {/* ===================================================================== */}
 
         {/* Hidden on mobile, runs on desktop hover */}
         <div className="hidden md:block absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-screen bg-[radial-gradient(120px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(61,111,196,0.35)_0%,rgba(61,111,196,0.08)_50%,transparent_100%)]" />
@@ -131,9 +150,11 @@ export function Home() {
 
         <SectionDecor />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Main feature cards down here stay exactly the same */}
+          {/* Main feature cards stay the same */}
         </div>
       </div>
+
+      <BlacklistModal isOpen={isBlacklistOpen} onClose={() => setIsBlacklistOpen(false)} />
     </div>
   );
 }
