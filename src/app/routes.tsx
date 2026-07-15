@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import { Layout } from "./components/Layout";
 import { WarpLoaderFallback } from "./components/warp/WarpLoaderFallback";
+import rosterRaw from "../data/roster.json";
 
 import { Home } from "./pages/Home";
 import { Roster } from "./pages/Roster";
@@ -22,12 +23,12 @@ export const router = createBrowserRouter([
     path: "/",
     Component: Layout,
     loader: async () => {
-      const [roster] = await Promise.all([
-        fetch("/data/roster.json").then((r) => r.json()),
+      await Promise.all([
         document.fonts.ready,
         wait(MIN_LOADER_DURATION),
       ]);
-      return { roster };
+      
+      return { roster: rosterRaw };
     },
     HydrateFallback: WarpLoaderFallback,
     children: [
