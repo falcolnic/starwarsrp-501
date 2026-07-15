@@ -36,38 +36,29 @@ export function Home() {
   return (
     <div>
       <section 
-        ref={heroRef}
-        onMouseMove={handleMouseMove}
         className="group min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6 bg-[#080d17]"
       >
-        <div className="hidden md:block absolute inset-0 pointer-events-none bg-[url('/hero-bg.png')] bg-cover bg-center opacity-90 brightness-110 contrast-105" />
-
-        {/* ================= ИНТЕРАКТИВНАЯ ЗОНА ПАПКИ CONFIDENTIAL ================= */}
-        <div
-          onClick={() => setIsBlacklistOpen(true)}
-          className="hidden md:block absolute bottom-[5%] left-[1.5%] w-[16%] h-[26%] cursor-pointer group z-20"
-          title="СЕКРЕТНЫЕ АРХИВЫ // КЛИК ДЛЯ ДЕШИФРОВАНИЯ"
+        <div 
+          ref={heroRef}
+          onMouseMove={handleMouseMove}
+          className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[66.66vw] min-h-[100vh] min-w-[150vh] pointer-events-auto select-none overflow-hidden z-0"
         >
-          {/* Красная рамка со свечением при ховере */}
-          <div className="absolute inset-0 border border-transparent group-hover:border-red-500/40 group-hover:bg-red-500/5 rounded transition-all duration-300 shadow-[0_0_0px_rgba(239,68,68,0)] group-hover:shadow-[0_0_15px_rgba(239,68,68,0.15)]" />
-          
-          {/* Текст подсказки сверху папки */}
-          <div className="absolute -top-10 left-4 opacity-0 group-hover:opacity-100 bg-[#0d0707] border border-red-500/50 text-red-500 text-[10px] py-1 px-2.5 rounded uppercase font-mono tracking-wider transition-all duration-300 pointer-events-none whitespace-nowrap shadow-[0_0_10px_rgba(239,68,68,0.2)]">
-            🚨 ACCESS RESTRICTED // LEVEL 3 🚨
+          <div className="absolute inset-0 pointer-events-none bg-[url('/hero-bg.png')] bg-cover bg-center opacity-90 brightness-110 contrast-105" />
+
+          <div
+            onClick={() => setIsBlacklistOpen(true)}
+            className="absolute bottom-[-9%] left-[-7%] w-[30%] h-[25%] rotate-65 cursor-pointer group z-20"
+          >
+            <div className="absolute inset-0 border-transparent group-hover:bg-red-1000/50 rounded transition-all  shadow-[0_0_0px_rgba(239,68,68,0)] group-hover:shadow-[0_0_15px_rgba(239,68,68,0.15)]" />
           </div>
+
+          <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-screen bg-[radial-gradient(120px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(61,111,196,0.35)_0%,rgba(61,111,196,0.08)_50%,transparent_100%)]" />
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_25%,#080d17_95%)] opacity-60" />
+          <div className="absolute inset-0 bg-[#080d17]/20 pointer-events-none" />
+
+          <div className="absolute top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(61,111,196,0.2)] via-[rgba(61,111,196,0.5)_50%] via-[rgba(61,111,196,0.2)_70%] to-transparent left-[30%] animate-[scan-down_8s_linear_infinite] pointer-events-none opacity-30" />
+          <div className="absolute top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(61,111,196,0.15)] via-[rgba(61,111,196,0.35)_50%] via-[rgba(61,111,196,0.15)_70%] to-transparent right-[25%] animate-[scan-down_11s_linear_3s_infinite] pointer-events-none opacity-25" />
         </div>
-        {/* ===================================================================== */}
-
-        {/* Hidden on mobile, runs on desktop hover */}
-        <div className="hidden md:block absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-screen bg-[radial-gradient(120px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(61,111,196,0.35)_0%,rgba(61,111,196,0.08)_50%,transparent_100%)]" />
-
-        {/* Hidden on mobile */}
-        <div className="hidden md:block absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_25%,#080d17_95%)] opacity-60" />
-        <div className="hidden md:block absolute inset-0 bg-[#080d17]/20 pointer-events-none" />
-
-        {/* 3. VERTICAL SCAN LINES - Hidden on mobile to keep small screens clean */}
-        <div className="hidden md:block absolute top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(61,111,196,0.2)] via-[rgba(61,111,196,0.5)_50%] via-[rgba(61,111,196,0.2)_70%] to-transparent left-[30%] animate-[scan-down_8s_linear_infinite] pointer-events-none opacity-30" />
-        <div className="hidden md:block absolute top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(61,111,196,0.15)] via-[rgba(61,111,196,0.35)_50%] via-[rgba(61,111,196,0.15)_70%] to-transparent right-[25%] animate-[scan-down_11s_linear_3s_infinite] pointer-events-none opacity-25" />
 
         <div className="relative z-10 flex flex-col items-center">
           <CornerDecoration position="top-left" />
