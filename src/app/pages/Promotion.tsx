@@ -41,13 +41,11 @@ export function Promotion() {
     const overallPct = requirements.length > 0 ? Math.round((completedCount / requirements.length) * 100) : 100;
 
     return (
-      <div className="relative w-full min-h-screen text-white py-10 px-6 bg-cover bg-center bg-no-repeat bg-[url('/promotion-bg.png')]">
-      <HUDSettings />
-      <CloneHelmetEasterEgg />
-      <div className="max-w-7xl mx-auto px-6 py-10 pb-20 text-white bg-[#080d17]">
-        
-
-        <div className="anim-fade-up mb-8">
+      <div className="relative w-full min-h-screen text-white py-10 px-6 bg-[#050910]">
+        <CloneHelmetEasterEgg />
+        <div className="fixed inset-0 pointer-events-none bg-[url('/promotion-bg.png')] bg-cover bg-center bg-no-repeat z-0 opacity-40"/>
+        <HUDSettings />
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 pb-20 text-white bg-[#080d17]/95 rounded-lg border border-slate-800/40 shadow-2xl">        <div className="anim-fade-up mb-8">
           <div className="font-mono text-sm tracking-[0.25em] text-[var(--primary)] mb-2 uppercase">
             501-Й ЭШЛ // ТРЕКЕР ПОВЫШЕНИЙ
           </div>

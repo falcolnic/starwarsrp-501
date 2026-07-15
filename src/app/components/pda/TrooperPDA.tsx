@@ -121,7 +121,7 @@ export function TrooperPDA() {
 
         <button
             onClick={() => setOpen(!open)}
-            className="flex items-center justify-center w-16 h-16 transition-all hover:scale-105"
+            className="flex items-center justify-center w-13 h-13 transition-all hover:scale-105"
             style={{
             background: "linear-gradient(180deg, #12203B 0%, #0d1829 100%)",
             border: "1px solid var(--primary)",
