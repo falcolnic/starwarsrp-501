@@ -11,6 +11,7 @@ import { homeTabs } from "../../data/homeTabs";
 import { GlitchText } from "../components/GlitchText";
 import { InfoTicker } from "../components/ui/InfoTicker";
 import { BlacklistModal } from "../components/BlackListModal";
+import { R2D2Peeker } from "../components/ui/R2D2Peeker";
 
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";
@@ -47,9 +48,9 @@ export function Home() {
 
           <div
             onClick={() => setIsBlacklistOpen(true)}
-            className="absolute bottom-[-9%] left-[-7%] w-[30%] h-[25%] rotate-65 cursor-pointer group z-20"
+            className="absolute bottom-[-9%] left-[-7%] w-[30%] h-[25%] rotate-65 cursor-pointer group/folder z-20"
           >
-            <div className="absolute inset-0 border-transparent group-hover:bg-red-1000/50 rounded transition-all  shadow-[0_0_0px_rgba(239,68,68,0)] group-hover:shadow-[0_0_15px_rgba(239,68,68,0.15)]" />
+            <div className="absolute inset-0 border-transparent rounded transition-all shadow-[0_0_0px_rgba(239,68,68,0)] group-hover/folder:shadow-[0_0_15px_rgba(239,68,68,0.25)]" />
           </div>
 
           <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-screen bg-[radial-gradient(120px_circle_at_var(--mouse-x)_var(--mouse-y),rgba(61,111,196,0.35)_0%,rgba(61,111,196,0.08)_50%,transparent_100%)]" />
@@ -104,12 +105,25 @@ export function Home() {
           </div>
 
           <div className="anim-fade-up flex gap-9 mt-12 flex-wrap justify-center [animation-delay:400ms]">
-            <Link to="/roster" className="no-underline">
-              <HudButton icon={<Users size={24} />} label="БАЗА ДАННЫХ ЛИЧНОГО СОСТАВА" primary />
-            </Link>
-            <Link to="/promotion" className="no-underline">
-              <HudButton icon={<TrendingUp size={24} />} label="ТРЕКЕР ПОВЫШЕНИЙ" />
-            </Link>
+            <div className="relative group/btn1 overflow-visible">
+              <span className="absolute -top-1 -left-1 w-3.5 h-3.5 border-t-2 border-l-2 border-[#3D6FC4] pointer-events-none opacity-0 -translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn1:translate-x-0 group-hover/btn1:translate-y-0 group-hover/btn1:opacity-100" />
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 border-t-2 border-r-2 border-[#3D6FC4] pointer-events-none opacity-0 translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn1:translate-x-0 group-hover/btn1:translate-y-0 group-hover/btn1:opacity-100" />
+              <span className="absolute -bottom-1 -left-1 w-3.5 h-3.5 border-b-2 border-l-2 border-[#3D6FC4] pointer-events-none opacity-0 -translate-x-2 translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn1:translate-x-0 group-hover/btn1:translate-y-0 group-hover/btn1:opacity-100" />
+              <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-b-2 border-r-2 border-[#3D6FC4] pointer-events-none opacity-0 translate-x-2 translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn1:translate-x-0 group-hover/btn1:translate-y-0 group-hover/btn1:opacity-100" />
+              <Link to="/roster" className="no-underline block">
+                <HudButton icon={<Users size={24} />} label="БАЗА ДАННЫХ ЛИЧНОГО СОСТАВА" primary />
+              </Link>
+            </div>
+
+            <div className="relative group/btn2 overflow-visible">
+              <span className="absolute -top-1 -left-1 w-3.5 h-3.5 border-t-2 border-l-2 border-[#3D6FC4] pointer-events-none opacity-0 -translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn2:translate-x-0 group-hover/btn2:translate-y-0 group-hover/btn2:opacity-100" />
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 border-t-2 border-r-2 border-[#3D6FC4] pointer-events-none opacity-0 translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn2:translate-x-0 group-hover/btn2:translate-y-0 group-hover/btn2:opacity-100" />
+              <span className="absolute -bottom-1 -left-1 w-3.5 h-3.5 border-b-2 border-l-2 border-[#3D6FC4] pointer-events-none opacity-0 -translate-x-2 translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn2:translate-x-0 group-hover/btn2:translate-y-0 group-hover/btn2:opacity-100" />
+              <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-b-2 border-r-2 border-[#3D6FC4] pointer-events-none opacity-0 translate-x-2 translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn2:translate-x-0 group-hover/btn2:translate-y-0 group-hover/btn2:opacity-100" />
+              <Link to="/promotion" className="no-underline block">
+                <HudButton icon={<TrendingUp size={24} />} label="ТРЕКЕР ПОВЫШЕНИЙ" />
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -119,7 +133,10 @@ export function Home() {
         </div>
       </section>
 
-      <InfoTicker />
+      <div className="relative">
+        <InfoTicker />
+        <R2D2Peeker />
+      </div>
 
       <div className="max-w-6xl mx-auto pt-0 px-6 pb-24">
         <SectionDecor />

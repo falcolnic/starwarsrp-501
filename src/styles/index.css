@@ -3,13 +3,8 @@
 @import './theme.css';
 @import './animations.css';
 
-
-@font-face {
-    font-family: 'Mandalorian';
-    src: url('/fonts/mandalor.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+html, body {
+    overflow-x: hidden;
 }
 
 @media (hover: hover) {
