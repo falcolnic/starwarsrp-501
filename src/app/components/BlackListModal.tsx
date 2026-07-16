@@ -35,11 +35,11 @@ export function BlacklistModal({ isOpen, onClose }: BlacklistModalProps) {
         className="absolute top-6 right-6 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
         aria-label="Закрыть"
       >
-        <X size={22} />
+        <X size={32} />
       </button>
 
       <div
-        className="relative w-full max-w-2xl [perspective:2200px]"
+        className="relative w-full max-w-2xl [perspective:2200px] translate-x-16"
         onClick={(e) => e.stopPropagation()}
       >
         <div
@@ -47,20 +47,20 @@ export function BlacklistModal({ isOpen, onClose }: BlacklistModalProps) {
         >
           <div className="px-6 pt-5 pb-4 flex items-start justify-between border-b border-[#3c321e]/25">
             <div>
-              <div className="font-[family:var(--font-display)] font-bold uppercase text-lg tracking-[0.08em] text-[#2b2418]">
+              <div className="font-[family:var(--font-display)] font-bold uppercase text-xl tracking-[0.08em] text-[#2b2418]">
                 Реестр предателей
               </div>
-              <div className="font-mono text-[11px] uppercase tracking-[0.12em] mt-1 text-[#6b5f47]">
+              <div className="font-mono text-xs uppercase tracking-[0.12em] mt-1 text-[#6b5f47]">
                 501st security division · допуск: level 3
               </div>
             </div>
-            <div className="font-mono font-bold text-[10px] uppercase tracking-[0.2em] text-[#8b1a1a] border border-[#8b1a1a] px-2 py-1 rotate-3 opacity-80 select-none">
+            <div className="font-mono font-bold text-base uppercase tracking-[0.2em] text-[#8b1a1a] border border-[#8b1a1a] px-2 py-1 rotate-3 opacity-80 select-none">
               Secret
             </div>
           </div>
 
           <div className="px-6 py-4">
-            <p className="font-mono text-xs italic leading-relaxed text-[#5a4d38]">
+            <p className="font-mono text-sm italic leading-relaxed text-[#5a4d38]">
               Несанкционированный доступ к данному досье запрещён военным кодексом ВАР 44-А. Каждое обращение фиксируется автоматически.
             </p>
           </div>
@@ -73,20 +73,18 @@ export function BlacklistModal({ isOpen, onClose }: BlacklistModalProps) {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="font-mono font-bold text-base tracking-[0.03em] text-[#2b2418]">
+                    <div className="font-mono font-bold text-lg tracking-[0.03em] text-[#2b2418]">
                       {entry.cid} — {entry.nickname}
                     </div>
-                    <div className="font-mono text-[10px] uppercase mt-0.5 text-[#8a7c5f]">
+                    <div className="font-mono text-xs uppercase mt-0.5 text-[#72644a]">
                       Дата регистрации: {entry.date}
                     </div>
                   </div>
 
                   <InkStamp status={entry.status} />
+
                 </div>
-                
-                <p className="font-mono text-[13px] leading-relaxed text-[#3d3324]">
-                  {entry.reason}
-                </p>
+                <p className="font-mono text-sm leading-relaxed text-[#3d3324]">{entry.reason}</p>
               </div>
             ))}
           </div>
@@ -104,7 +102,7 @@ export function BlacklistModal({ isOpen, onClose }: BlacklistModalProps) {
           }}
         >
           <div
-            className="group absolute inset-0 flex flex-col items-center justify-center pointer-events-auto cursor-pointer bg-[radial-gradient(circle_at_30%_20%,#2a2520,#17140f)] shadow-[rgba(0,0,0,0.6),0_20px_60px_rgba(0,0,0,0.6)] "
+            className="group absolute inset-0 flex flex-col items-center justify-center pointer-events-auto cursor-pointer bg-[radial-gradient(circle_at_30%_20%,#2a2520,#17140f)] shadow-[rgba(0,0,0,0.6),0_20px_60px_rgba(0,0,0,0.6)] [backface-visibility:hidden]"
             onClick={() => setCoverOpen(true)}
           >
             <div className="absolute left-0 top-1/2 -translate-y-1/2 px-2 py-7 font-mono font-bold text-xs uppercase tracking-[0.2em] bg-[#3a352c] text-[#c9c2b0] border border-[#55503f] [writing-mode:vertical-rl]">
@@ -139,6 +137,19 @@ export function BlacklistModal({ isOpen, onClose }: BlacklistModalProps) {
               Нажмите, чтобы открыть
             </span>
           </div>
+
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center pointer-events-auto cursor-pointer bg-[radial-gradient(circle_at_70%_20%,#201c18,#120f0c)] shadow-[inset_0_0_50px_rgba(0,0,0,0.8)] border-r border-[#3a352c]/20 [backface-visibility:hidden] [transform:rotateY(180deg)]"
+            onClick={() => setCoverOpen(false)}
+          >
+            <div className="absolute inset-6 border border-[#3a352c]/10 flex flex-col items-center justify-center pointer-events-none">
+              <div className="font-mono text-base text-[#757462] uppercase tracking-[0.3em] text-center space-y-1">
+                <p>В.А.Р. // АРХИВЫ</p>
+                <p className="text-xs mt-5 text-orange-900">ДИСЦИПЛИНА ПРЕВЫШЕ ВСЕГО</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

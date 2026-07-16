@@ -5,8 +5,8 @@ export interface NavLinkItem {
 }
 
 export const navLinks: NavLinkItem[] = [
-    { to: "/", label: "Home Base", end: true },
-    { to: "/roster", label: "Roster", end: false },
-    { to: "/promotion", label: "Promotions", end: false },
-    { to: "/map", label: "Tactical Map", end: false },
+    { to: "/", label: "Главная", end: true },
+    { to: "/roster", label: "Состав", end: false },
+    { to: "/promotion", label: "Продвижение", end: false },
+    { to: "/map", label: "Карта", end: false },
 ];

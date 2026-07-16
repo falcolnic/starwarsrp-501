@@ -3,13 +3,22 @@
 @import './theme.css';
 @import './animations.css';
 
+
+@font-face {
+    font-family: 'Mandalorian';
+    src: url('/fonts/mandalor.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 @media (hover: hover) {
     /* 1. DEFAULT STATE */
     html, body, .cursor-default {
         cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cG9seWdvbiBwb2ludHM9IjAsMCAxNyw1IDEwLDkgNiwxNyIgZmlsbD0iIzNENkZDNCIgc3Ryb2tlPSIjMDgwZDE3IiBzdHJva2Utd2lkdGg9IjEuNSIvPjwvc3ZnPg==") 0 0, auto !important;
     }
 
-    /* 2. TEXT STATE: Blue I-Beam */
+    /* 2. TEXT STATE */
     p, h1, h2, h3, h4, h5, h6, span, li, label, input, textarea, font {
         cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDE2IDI0Ij48bGluZSB4MT0iOCIgeTE9IjQiIHgyPSI4IiB5Mj0iMjAiIHN0cm9rZT0iIzNENkZDNCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjQiIHkxPSI0IiB4Mj0iMTIiIHkyPSI0IiBzdHJva2U9IiMzRDZGQzQiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjQiIHkxPSIyMCIgeDI9IjEyIiB5Mj0iMjAiIHN0cm9rZT0iIzNENkZDNCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48L3N2Zz4=") 8 12, text !important;
     }
@@ -19,9 +28,9 @@
     button, button *,
     [role="button"], [role="button"] *,
     input[type="submit"], input[type="button"], input[type="checkbox"], input[type="radio"],
-    select,
-    summary,
+    select, summary,
     .cursor-pointer, .cursor-pointer * {
         cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI3IiBmaWxsPSJub25lIiBzdHJva2U9IiNGNUM1MTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjEyIiB5MT0iMSIgeDI9IjEyIiB5Mj0iNSIgc3Ryb2tlPSIjRjVDNTE4IiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIxMiIgeTE9IjE5IiB4Mj0iMTIiIHkyPSIyMyIgc3Ryb2tlPSIjRjVDNTE4IiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIxIiB5MT0iMTIiIHgyPSI1IiB5Mj0iMTIiIHN0cm9rZT0iI0Y1QzUxOCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48bGluZSB4MT0iMTkiIHkxPSIxMiIgeDI9IjIzIiB5Mj0iMTIiIHN0cm9rZT0iI0Y1QzUxOCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxLjUiIGZpbGw9IiNGNUM1MTgiLz48L3N2Zz4=") 12 12, pointer !important;
     }
 }
+

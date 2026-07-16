@@ -24,15 +24,11 @@ export function Navbar() {
             >
                 <Logo className="w-14 h-14" imgSize={76} divSize={76} />
                 <div>
-                    <div className="text-2xl font-bold leading-none tracking-[0.12em]"
-                        style={{ fontFamily: "var(--font-display)", color: "var(--foreground)" }}
-                    >
+                    <div className="text-2xl font-bold leading-none tracking-[0.12em] text-[var(--foreground)] font-[family:var(--font-display)]">
                         501ST ELITE ASSAULT LEGION
                     </div>
-                    <div className="text-[0.9rem] tracking-[0.15em] mt-1"
-                        style={{ fontFamily: "var(--font-mono)", color: "var(--muted-foreground)" }}
-                    >
-                        GALACTIC REPUBLIC · GRAND ARMY
+                    <div className="text-sm tracking-[0.15em] mt-2 text-[var(--muted-foreground)] font-[family:var(--font-mono)]">
+                        Великая · Армия · Республики
                     </div>
                 </div>
             </button>
@@ -50,7 +46,6 @@ export function Navbar() {
                                     : "text-[var(--muted-foreground)] border-transparent hover:text-[var(--foreground)]"
                             }`
                         }
-                        style={{ fontFamily: "var(--font-display)" }}
                     >
                         {link.label}
                     </NavLink>

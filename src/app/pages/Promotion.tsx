@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, TrendingUp, CheckCircle2, Zap, User } from "lucide-react";
+import { ChevronDown, TrendingUp, CheckCircle2, Zap, User, BookOpen } from "lucide-react";
 import { fetchBotData, calcDaysAtRank, type BotSoldierData } from "../../services/botData";
 import { getNextRank, getRankIndex, evaluateRequirements, type RequirementStatus } from "../../services/promotionRules";
 import rosterRaw from "../../data/roster.json";
@@ -9,6 +9,7 @@ import { RankLadder } from "../components/promotion/RankLadder";
 import { RequirementRow } from "../components/promotion/RequirementRow";
 import { CloneHelmetEasterEgg } from "../components/ui/CloneHelmetEasterEgg";
 import { HUDSettings } from "../components/ui/HUDSettings";
+import { Link } from "react-router";
 
 const rosterManual = rosterRaw as RosterManual[];
 
@@ -45,19 +46,27 @@ export function Promotion() {
         <CloneHelmetEasterEgg />
         <div className="fixed inset-0 pointer-events-none bg-[url('/promotion-bg.png')] bg-cover bg-center bg-no-repeat z-0 opacity-40"/>
         <HUDSettings />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 pb-20 text-white bg-[#080d17]/95 rounded-lg border border-slate-800/40 shadow-2xl">        <div className="anim-fade-up mb-8">
-          <div className="font-mono text-sm tracking-[0.25em] text-[var(--primary)] mb-2 uppercase">
-            501-Й ЭШЛ // ТРЕКЕР ПОВЫШЕНИЙ
-          </div>
-          <div className="flex items-center gap-3">
-            <TrendingUp size={24} className="text-[var(--primary)]" />
-            <h1 className="text-2xl lg:text-3xl font-display tracking-[0.06em] m-0 uppercase">
-              Система Повышений
-            </h1>
-          </div>
-        </div>
 
-        {/* Custom dropdown selector */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 pb-20 text-white bg-[#080d17]/95 rounded-none border border-slate-800/60 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+          <div className="anim-fade-up mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-5 border-b border-slate-800/60 pb-6">
+            <div>
+              <div className="font-mono text-sm tracking-[0.25em] text-[var(--primary)] mb-2 uppercase">
+                501-Й ЭШЛ // ТРЕКЕР ПОВЫШЕНИЙ
+              </div>
+              <div className="flex items-center gap-3">
+                <TrendingUp size={24} className="text-[var(--primary)]" />
+                <h1 className="text-2xl lg:text-3xl font-[family:var(--font-display)] tracking-[0.06em] m-0 uppercase text-white">
+                  Система Повышений
+                </h1>
+              </div>
+            </div>
+
+            <Link to="/promotion/rules" className="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-800 hover:border-[var(--primary)] bg-slate-900/10 hover:bg-[var(--primary)]/5 text-base text-slate-300 hover:text-white transition-all uppercase tracking-wider rounded-none w-full md:w-auto shrink-0">
+              <BookOpen size={21} className="text-[var(--primary)]" />
+              <span>Открыть регламент званий</span>
+            </Link>
+          </div>
+
         <div className="anim-fade-up mb-6 relative max-w-sm z-5">
           <div className="font-mono text-sm tracking-widest text-[var(--muted-foreground)] mb-2 uppercase">
             Выбрать бойца
@@ -109,7 +118,6 @@ export function Promotion() {
 
         {manual && (
           <div className="space-y-4">
-            {/* Visual rank timeline */}
             <div className="z-1 bg-[#0d1829] border border-[var(--border)] rounded-md p-5 shadow-md">
               <div className="font-mono text-sm tracking-widest text-[var(--muted-foreground)] mb-3 uppercase">
                 Лестница Повышений
@@ -127,7 +135,6 @@ export function Promotion() {
               <InfoBlock label="Сессий" value={String(bot?.online.sessions ?? 0)} mono />
             </div>
 
-            {/* Active Requirements Checklist panel */}
             {nextRank ? (
               <div className="bg-[#0d1829] border border-[var(--border)] rounded-md overflow-hidden shadow-lg">
                 <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between gap-4 flex-wrap bg-[#080d17]/50">
@@ -140,7 +147,6 @@ export function Promotion() {
                     </div>
                   </div>
 
-                  {/* Circular svg tracker gauge */}
                   <div className="flex items-center gap-3">
                     <div className="font-mono text-sm tracking-wider text-right">
                       <span className={overallPct >= 100 ? "text-[#2ECC71] font-bold" : "text-[var(--primary)]"}>
@@ -182,7 +188,6 @@ export function Promotion() {
                   </div>
                 </div>
 
-                {/* Source classification legend bar */}
                 <div className="px-4 py-2 bg-[#080d17]/30 border-b border-[var(--border)] flex items-center gap-5 flex-wrap">
                   <div className="flex items-center gap-1.5 font-mono text-xs text-[var(--muted-foreground)] tracking-wider">
                     <Zap size={10} className="text-[var(--primary)]" />
@@ -192,7 +197,6 @@ export function Promotion() {
                   </div>
                 </div>
 
-                {/* Requirements Listing logs */}
                 <div className="divide-y divide-[var(--border)]/30">
                   {requirements.map((rs) => (
                     <RequirementRow key={rs.requirement.id} rs={rs} />

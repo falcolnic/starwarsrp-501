@@ -93,7 +93,7 @@ export function CloneHelmetEasterEgg() {
         >
             <div className="relative flex flex-col items-center">
             {quote && (
-                <div className="absolute bottom-full bg-[#0d1829]/95 border-1 border-[var(--primary)] text-[var(--primary)] text-[8px] font-mono font-bold tracking-widest px-3 py-1 rounded shadow-[0_0_15px_rgba(61,111,196,0.5)] animate-bounce text-center uppercase whitespace-nowrap z-10">
+                <div className="absolute bottom-full bg-[#0d1829]/95 border-1 border-[var(--primary)] text-[var(--primary)] text-sm font-mono font-bold tracking-widest px-3 py-1 rounded shadow-[0_0_15px_rgba(61,111,196,0.5)] animate-bounce text-center uppercase whitespace-nowrap z-10">
                 {quote}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-[var(--primary)]" />
                 </div>

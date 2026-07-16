@@ -9,7 +9,7 @@ export function InkStamp({ status }: InkStampProps) {
 
     return (
         <div
-        className={`inline-block px-3 py-1 font-mono font-bold uppercase text-[10px] tracking-[0.15em] select-none border-2 -rotate-4 opacity-85 mix-blend-multiply mt-[0.9rem] ${textColor} ${borderColor}`}
+            className={`inline-block px-3 py-1 font-mono font-bold uppercase text-xs tracking-[0.15em] select-none border-2 -rotate-4 opacity-85 mix-blend-multiply mt-[0.9rem] ${textColor} ${borderColor}`}
         >
         {label}
         </div>
