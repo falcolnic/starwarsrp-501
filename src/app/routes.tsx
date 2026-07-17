@@ -13,6 +13,7 @@ import { Equipment } from "./pages/Equipment";
 import { DatabaseLayout } from "./components/database/DatabaseLayout";
 import { PromotionRulesPage } from "./pages/PromotionRulesPage";
 import { ErrorPage } from "./pages/ErrorPage";
+import { Commanders } from "./pages/Commanders";
 
 const MIN_LOADER_DURATION = 8000;
 
@@ -55,6 +56,7 @@ await Promise.all([
       { path: "promotion", Component: Promotion },
       { path: "promotion/rules", Component: PromotionRulesPage },
       { path: "map", Component: MapViewer },
+      { path: "commanders", Component: Commanders },
       { 
         Component: DatabaseLayout,
         children: [

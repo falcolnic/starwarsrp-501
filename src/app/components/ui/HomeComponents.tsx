@@ -47,7 +47,7 @@ export function AccordionTab({ tab, index }: { tab: { id: string; label: string;
         </button>
 
         <div style={{ height }} className="overflow-hidden transition-[height] duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]">
-            <div ref={contentRef} className="pt-[4px] px-[20px] pb-[20px] pl-[55px] border-t border-[var(--border)]">
+            <div ref={contentRef} className="pt-[4px] px-[20px] pb-[20px] border-t border-[var(--border)]">
                 {tab.content}
             </div>
         </div>
