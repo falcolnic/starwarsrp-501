@@ -25,7 +25,7 @@ router.post("/login", async (req, res) => {
 
   res.cookie(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     expires: expiresAt,
   });
