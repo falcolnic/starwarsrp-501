@@ -69,9 +69,6 @@ export function PlaceholderText({ lines = 4 }: { lines?: number }) {
         {sentences.slice(0, lines).map((s, i) => (
             <p key={i} className="font-sans text-sm text-[var(--muted-foreground)] leading-[1.75] m-0">{s}</p>
         ))}
-        <p className="font-[var(--font-mono)] text-xs text-[rgba(143,163,192,0.3)] tracking-[0.08em] m-0 mt-[4px] border-t border-[var(--border)] pt-[8px]">
-            [ЗАГЛУШКА — КЛИЕНТ ПРЕДОСТАВИТ ФИНАЛЬНЫЙ ТЕКСТ]
-        </p>
         </div>
     );
 }

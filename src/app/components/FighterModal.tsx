@@ -1,45 +1,35 @@
-import { useEffect, useState, useCallback, type CSSProperties } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { X, Clipboard, Check } from "lucide-react";
-import { calcDaysAtRank } from "../../services/botData";
-import type { BotSoldierData } from "../../services/botData";
-import { getRankIndex, RANK_LADDER } from "../../services/promotionRules";
+import { useRanks } from "../../hooks/useRanks";
+import type { DbRank } from "../../services/rankService";
+import { Soldier } from "../../services/soldierService";
 
-/* ── Data interface ── */
-export interface RosterManual {
-  cid: string;
-  callsignOverride: string;
-  positions: string[];
-  squads: string[];
-  attached: string[];
-  medals: { name: string; icon: string; image: string }[];
-  reprimands: number;
-  reprimandsFrozen: boolean;
-  status: string;
-  leaveUntil: string;
-  reserveUntil: string;
-  joinDate: string;
-  discordId: string;
-  avatar: string;
-  promotion: { manualCompleted: string[] };
-}
-
-/* ── 9-status configuration ── */
 export const STATUS_CONFIG: Record<string, { label: string; color: string; dot: string; freeze: boolean }> = {
-  active:    { label: "БОЕВОЙ",        color: "#2ECC71", dot: "status-dot-active",   freeze: false },
-  leave:     { label: "ОТПУСК",        color: "#F5C518", dot: "status-dot-warning",  freeze: true  },
-  reserve:   { label: "РЕЗЕРВ",        color: "#F5C518", dot: "status-dot-warning",  freeze: true  },
-  medical:   { label: "МЕД. ОТВОД",    color: "#E67E22", dot: "status-dot-warning",  freeze: false },
-  training:  { label: "ОБУЧЕНИЕ",      color: "#3D6FC4", dot: "",                    freeze: false },
-  detached:  { label: "ПРИКОМАНДИР.",  color: "#9B59B6", dot: "",                    freeze: false },
-  suspended: { label: "ОТСТРАНЁН",     color: "#E74C3C", dot: "status-dot-critical", freeze: false },
-  awol:      { label: "САМОВОЛКА",     color: "#E74C3C", dot: "status-dot-critical", freeze: false },
-  dismissed: { label: "УВОЛЕН",        color: "#555E6E", dot: "",                    freeze: false },
+  active: { label: "БОЕВОЙ", color: "#2ECC71", dot: "status-dot-active", freeze: false },
+  leave: { label: "ОТПУСК", color: "#F5C518", dot: "status-dot-warning", freeze: true },
+  reserve: { label: "РЕЗЕРВ", color: "#F5C518", dot: "status-dot-warning", freeze: true },
+  medical: { label: "МЕД. ОТВОД", color: "#E67E22", dot: "status-dot-warning", freeze: false },
+  training: { label: "ОБУЧЕНИЕ", color: "#3D6FC4", dot: "", freeze: false },
+  detached: { label: "ПРИКОМАНДИР.", color: "#9B59B6", dot: "", freeze: false },
+  suspended: { label: "ОТСТРАНЁН", color: "#E74C3C", dot: "status-dot-critical", freeze: false },
+  awol: { label: "САМОВОЛКА", color: "#E74C3C", dot: "status-dot-critical", freeze: false },
+  dismissed: { label: "УВОЛЕН", color: "#555E6E", dot: "", freeze: false },
 };
 
-/* ── Deterministic barcode ── */
+function calcDaysAtRank(rankSince: string | null): number {
+  if (!rankSince) return 0;
+  const parts = rankSince.split(".");
+  if (parts.length !== 3) return 0;
+  const date = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+  if (isNaN(date.getTime())) return 0;
+  const diff = Date.now() - date.getTime();
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+}
+
 function getBarcodeWidths(value: string): number[] {
+  const safeValue = value && value.length > 0 ? value : "0";
   return Array.from({ length: 52 }, (_, i) => {
-    const code = value.charCodeAt(i % value.length) ^ (i * 7);
+    const code = safeValue.charCodeAt(i % safeValue.length) ^ (i * 7);
     return ((code % 3) + 1) * 1.5;
   });
 }
@@ -47,9 +37,13 @@ function getBarcodeWidths(value: string): number[] {
 function Barcode({ value }: { value: string }) {
   const widths = getBarcodeWidths(value);
   return (
-    <div style={{ display: "flex", gap: 1.5, alignItems: "flex-end", height: 32, opacity: 0.5 }}>
+    <div className="flex gap-[1.5px] items-end h-8 opacity-50">
       {widths.map((w, i) => (
-        <div key={i} style={{ width: w, background: "var(--primary)", height: i % 5 === 0 ? "100%" : `${55 + (i % 4) * 12}%` }} />
+        <div
+          key={i}
+          className="bg-[var(--primary)]"
+          style={{ width: w, height: i % 5 === 0 ? "100%" : `${55 + (i % 4) * 12}%` }}
+        />
       ))}
     </div>
   );
@@ -57,33 +51,58 @@ function Barcode({ value }: { value: string }) {
 
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
+  const [failed, setFailed] = useState(false);
+
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(value).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+    navigator.clipboard
+      .writeText(value)
+      .then(() => {
+        setCopied(true);
+        setFailed(false);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => {
+        setFailed(true);
+        setTimeout(() => setFailed(false), 2000);
+      });
   }, [value]);
+
   return (
-    <button onClick={handleCopy} style={{
-      display: "flex", alignItems: "center", gap: 6, padding: "6px 12px",
-      background: copied ? "rgba(46,204,113,0.12)" : "rgba(61,111,196,0.1)",
-      border: `1px solid ${copied ? "rgba(46,204,113,0.35)" : "rgba(61,111,196,0.3)"}`,
-      color: copied ? "#2ECC71" : "var(--primary)", cursor: "pointer",
-      fontFamily: "var(--font-mono)", fontSize: "0.62rem", letterSpacing: "0.1em",
-      transition: "all 0.2s",
-    }}>
-      {copied ? <Check size={11} /> : <Clipboard size={11} />}
-      {copied ? "СКОПИРОВАНО ✓" : label}
+    <button
+      onClick={handleCopy}
+      className="flex items-center gap-2 px-3.5 py-2 font-mono text-xs tracking-[0.1em] transition-all border cursor-pointer"
+      style={{
+        background: copied ? "rgba(46,204,113,0.12)" : failed ? "rgba(231,76,60,0.12)" : "rgba(61,111,196,0.1)",
+        borderColor: copied ? "rgba(46,204,113,0.35)" : failed ? "rgba(231,76,60,0.4)" : "rgba(61,111,196,0.3)",
+        color: copied ? "#2ECC71" : failed ? "#E74C3C" : "var(--primary)",
+      }}
+    >
+      {copied ? <Check size={13} /> : <Clipboard size={13} />}
+      {copied ? "СКОПИРОВАНО ✓" : failed ? "НЕ УДАЛОСЬ" : label}
     </button>
   );
 }
 
-function Field({ label, value, mono = false, highlight = false }: { label: string; value?: string; mono?: boolean; highlight?: boolean }) {
+function Field({
+  label,
+  value,
+  mono = false,
+  highlight = false,
+}: {
+  label: string;
+  value?: string | null;
+  mono?: boolean;
+  highlight?: boolean;
+}) {
   if (!value) return null;
   return (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.18em", color: "rgba(143,163,192,0.45)", marginBottom: 3 }}>{label}</div>
-      <div className={highlight ? "anim-flicker" : ""} style={{ fontFamily: mono ? "var(--font-mono)" : "var(--font-display)", fontSize: mono ? "0.78rem" : "0.88rem", color: highlight ? "var(--primary)" : "var(--foreground)", letterSpacing: "0.05em" }}>
+    <div className="mb-3">
+      <div className="font-mono text-xs tracking-[0.18em] text-[var(--muted-foreground)]/50 mb-1">{label}</div>
+      <div
+        className={`${mono ? "font-mono text-base" : "font-[var(--font-display)] text-lg"} tracking-[0.05em] ${
+          highlight ? "anim-flicker text-[var(--primary)]" : "text-[var(--foreground)]"
+        }`}
+      >
         {value}
       </div>
     </div>
@@ -92,24 +111,30 @@ function Field({ label, value, mono = false, highlight = false }: { label: strin
 
 function ReprimandBar({ count, frozen }: { count: number; frozen: boolean }) {
   return (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.18em", color: "rgba(143,163,192,0.45)", marginBottom: 6 }}>ВЗЫСКАНИЯ</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ display: "flex", gap: 4 }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{
-              width: 28, height: 8,
-              background: i < count ? (count >= 3 ? "#E74C3C" : "#F5C518") : "rgba(61,111,196,0.1)",
-              border: `1px solid ${i < count ? (count >= 3 ? "rgba(231,76,60,0.5)" : "rgba(245,197,24,0.5)") : "rgba(61,111,196,0.2)"}`,
-              boxShadow: i < count && count >= 3 ? "0 0 6px rgba(231,76,60,0.4)" : "none",
-            }} />
+    <div className="mb-4">
+      <div className="font-mono text-xs tracking-[0.18em] text-[var(--muted-foreground)]/50 mb-2">ВЗЫСКАНИЯ</div>
+      <div className="flex items-center gap-3">
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-8 h-2.5 border"
+              style={{
+                background: i < count ? (count >= 3 ? "#E74C3C" : "#F5C518") : "rgba(61,111,196,0.1)",
+                borderColor: i < count ? (count >= 3 ? "rgba(231,76,60,0.5)" : "rgba(245,197,24,0.5)") : "rgba(61,111,196,0.2)",
+                boxShadow: i < count && count >= 3 ? "0 0 6px rgba(231,76,60,0.4)" : "none",
+              }}
+            />
           ))}
         </div>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: count >= 3 ? "#E74C3C" : count > 0 ? "#F5C518" : "var(--muted-foreground)" }}>
+        <div
+          className="font-mono text-sm"
+          style={{ color: count >= 3 ? "#E74C3C" : count > 0 ? "#F5C518" : "var(--muted-foreground)" }}
+        >
           {count}/3
         </div>
         {frozen && (
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.1em", color: "#F5C518", background: "rgba(245,197,24,0.08)", border: "1px solid rgba(245,197,24,0.25)", padding: "2px 6px" }}>
+          <div className="font-mono text-xs tracking-[0.1em] text-[#F5C518] bg-[#F5C518]/10 border border-[#F5C518]/25 px-2 py-0.5">
             ЗАМОРОЖЕНО
           </div>
         )}
@@ -118,185 +143,227 @@ function ReprimandBar({ count, frozen }: { count: number; frozen: boolean }) {
   );
 }
 
-function RankBar({ rank }: { rank: string }) {
-  const idx = getRankIndex(rank);
-  const pct = Math.round(((idx < 0 ? 0 : idx) / (RANK_LADDER.length - 1)) * 100);
+function RankBar({ rank, ranks }: { rank: string; ranks: DbRank[] }) {
+  const idx = ranks.findIndex((r) => r.name === rank);
+  const totalRanks = ranks.length > 0 ? ranks.length : 1;
+  const isUnknown = idx < 0;
+  const pct = isUnknown ? 0 : Math.round((idx / (totalRanks - 1 || 1)) * 100);
+
   return (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.18em", color: "rgba(143,163,192,0.45)", marginBottom: 5, display: "flex", justifyContent: "space-between" }}>
+    <div className="mb-4">
+      <div className="font-mono text-xs tracking-[0.18em] text-[var(--muted-foreground)]/50 mb-1.5 flex justify-between">
         <span>ПРОГРЕСС ЗВАНИЯ</span>
-        <span style={{ color: "var(--primary)" }}>{idx < 0 ? "?" : idx + 1} / {RANK_LADDER.length}</span>
+        <span className={isUnknown ? "text-[var(--muted-foreground)]" : "text-[var(--primary)]"}>
+          {isUnknown ? "ДАННЫЕ НЕДОСТУПНЫ" : `${idx + 1} / ${totalRanks}`}
+        </span>
       </div>
-      <div style={{ height: 3, background: "rgba(61,111,196,0.12)", border: "1px solid rgba(61,111,196,0.12)", position: "relative" }}>
-        <div style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: `${pct}%`, background: "var(--primary)", boxShadow: "0 0 8px rgba(61,111,196,0.5)", animation: "progress-fill 1.2s ease both" }} />
+      <div className="h-[3px] bg-[var(--primary)]/10 border border-[var(--primary)]/10 relative">
+        {!isUnknown && (
+          <div
+            className="absolute top-0 left-0 bottom-0 bg-[var(--primary)] shadow-[0_0_8px_rgba(61,111,196,0.5)]"
+            style={{ width: `${pct}%`, animation: "progress-fill 1.2s ease both" }}
+          />
+        )}
       </div>
     </div>
   );
 }
 
-interface Props {
-  manual: RosterManual;
-  bot: BotSoldierData | null;
+interface FighterModalProps {
+  soldier: Soldier;
   onClose: () => void;
 }
 
-export function FighterModal({ manual, bot, onClose }: Props) {
-  const sc = STATUS_CONFIG[manual.status] ?? STATUS_CONFIG.active;
-  const daysAtRank = bot ? calcDaysAtRank(bot.rankSince) : 0;
-  const npzValue = `${manual.cid} | ${bot?.nickname ?? `CT-${manual.cid}`} | ${bot?.rank ?? "—"}`;
-  const steamId = bot?.steamId ?? "";
+export function FighterModal({ soldier, onClose }: FighterModalProps) {
+  const { ranks } = useRanks();
+  const sc = STATUS_CONFIG[soldier.status] ?? STATUS_CONFIG.active;
+  const daysAtRank = calcDaysAtRank(soldier.rankSince);
+  const displayName = soldier.nickname ?? `CT-${soldier.cid}`;
+  const npzValue = `${soldier.cid} | ${displayName} | ${soldier.rank ?? "—"}`;
+  const steamId = soldier.steamId ?? "";
+  const discordId = soldier.discordId ?? "";
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const [avatarBroken, setAvatarBroken] = useState(false);
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const cardStyle: CSSProperties = {
-    background: "linear-gradient(160deg, #0d1829 0%, #080f1c 60%, #0a1220 100%)",
-    border: "1px solid rgba(61,111,196,0.35)",
-    boxShadow: "0 0 60px rgba(0,0,0,0.85), 0 0 30px rgba(61,111,196,0.1)",
-    clipPath: "polygon(0 0, calc(100% - 32px) 0, 100% 32px, 100% 100%, 32px 100%, 0 calc(100% - 32px))",
-    width: "100%",
-    maxWidth: 640,
-    position: "relative",
-    maxHeight: "90vh",
-    overflowY: "auto",
-  };
+  useEffect(() => {
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, []);
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
 
   return (
     <div
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(4,8,16,0.88)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="fighter-modal-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-[200] bg-[rgba(4,8,16,0.88)] flex items-center justify-center p-4 backdrop-blur-xs"
     >
-      <div className="anim-modal scan-overlay" style={cardStyle}>
-
-        {/* Header strip */}
-        <div style={{ background: "rgba(61,111,196,0.06)", borderBottom: "1px solid rgba(61,111,196,0.2)", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 2, backdropFilter: "blur(4px)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 3, height: 18, background: "var(--primary)", boxShadow: "0 0 8px var(--primary)" }} />
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.58rem", letterSpacing: "0.22em", color: "var(--primary)" }}>ЛИЧНОЕ ДЕЛО БОЙЦА // ДОПУСК: ВНУТРЕННИЙ</div>
+      <div
+        className="anim-modal scan-overlay relative w-full max-w-[680px] max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#0d1829] via-[#080f1c] to-[#0a1220] border border-[var(--primary)]/35 shadow-[0_0_60px_rgba(0,0,0,0.85),0_0_30px_rgba(61,111,196,0.1)]"
+        style={{ clipPath: "polygon(0 0, calc(100% - 32px) 0, 100% 32px, 100% 100%, 32px 100%, 0 calc(100% - 32px))" }}
+      >
+        <div className="sticky top-0 z-[2] bg-[var(--primary)]/[0.06] border-b border-[var(--primary)]/20 px-5 py-3.5 flex items-center justify-between backdrop-blur-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-[3px] h-5 bg-[var(--primary)] shadow-[0_0_8px_var(--primary)]" />
+            <div className="font-mono text-xs tracking-[0.22em] text-[var(--primary)]">
+              ЛИЧНОЕ ДЕЛО БОЙЦА // ДОПУСК: ВНУТРЕННИЙ
+            </div>
           </div>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
-            style={{ background: "none", border: "1px solid rgba(61,111,196,0.2)", color: "var(--muted-foreground)", cursor: "pointer", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-            onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = "rgba(231,76,60,0.5)"; el.style.color = "#E74C3C"; }}
-            onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = "rgba(61,111,196,0.2)"; el.style.color = "var(--muted-foreground)"; }}
+            aria-label="Закрыть"
+            className="w-8 h-8 flex items-center justify-center border border-[var(--primary)]/20 text-[var(--muted-foreground)] hover:border-red-500/50 hover:text-red-500 transition-all cursor-pointer"
           >
-            <X size={14} />
+            <X size={16} />
           </button>
         </div>
 
-        <div style={{ padding: "20px 24px" }}>
-          {/* Top: identity + avatar */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 20, marginBottom: 16, alignItems: "start" }}>
+        <div className="px-6 py-5">
+          <div className="grid grid-cols-[1fr_auto] gap-5 mb-4 items-start">
             <div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 3 }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", letterSpacing: "0.2em", color: "rgba(143,163,192,0.4)" }}>CID-{manual.cid}</div>
-                {manual.callsignOverride && (
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", letterSpacing: "0.12em", color: "rgba(61,111,196,0.7)" }}>{manual.callsignOverride}</div>
+              <div className="flex items-baseline gap-3 mb-1">
+                <div className="font-mono text-xs tracking-[0.2em] text-[var(--muted-foreground)]/40">
+                  CID-{soldier.cid}
+                </div>
+                {soldier.callsignOverride && (
+                  <div className="font-mono text-sm tracking-[0.12em] text-[var(--primary)]/70">
+                    {soldier.callsignOverride}
+                  </div>
                 )}
               </div>
-              <div style={{ fontFamily: "var(--font-display)", fontSize: "1.65rem", fontWeight: 700, letterSpacing: "0.06em", color: "var(--foreground)", lineHeight: 1.1, marginBottom: 4 }}>
-                {bot?.nickname ?? `CT-${manual.cid}`}
+              <div
+                id="fighter-modal-title"
+                className="font-[var(--font-display)] text-3xl font-bold tracking-[0.06em] text-[var(--foreground)] leading-tight mb-1.5"
+              >
+                {displayName}
               </div>
-              <div className="anim-flicker" style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", letterSpacing: "0.08em", color: "var(--primary)", marginBottom: 12 }}>
-                {bot?.rank ?? "—"}
+              <div className="anim-flicker font-[var(--font-display)] text-lg tracking-[0.08em] text-[var(--primary)] mb-3">
+                {soldier.rank ?? "—"}
               </div>
 
-              {/* Status */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                {sc.dot && <div className={sc.dot} style={{ width: 7, height: 7, borderRadius: "50%", background: sc.color, boxShadow: `0 0 8px ${sc.color}` }} />}
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", letterSpacing: "0.14em", color: sc.color, background: `${sc.color}15`, border: `1px solid ${sc.color}40`, padding: "2px 8px" }}>
+              <div className="flex items-center gap-2 flex-wrap">
+                {sc.dot && (
+                  <div
+                    className={sc.dot}
+                    style={{ width: 8, height: 8, borderRadius: "50%", background: sc.color, boxShadow: `0 0 8px ${sc.color}` }}
+                  />
+                )}
+                <div
+                  className="font-mono text-xs tracking-[0.14em] px-2.5 py-1 border"
+                  style={{ color: sc.color, background: `${sc.color}15`, borderColor: `${sc.color}40` }}
+                >
                   {sc.label}
                 </div>
-                {manual.leaveUntil && (
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.56rem", color: "#F5C518", letterSpacing: "0.08em" }}>до {manual.leaveUntil}</div>
+                {soldier.leaveUntil && (
+                  <div className="font-mono text-xs text-[#F5C518] tracking-[0.08em]">до {soldier.leaveUntil}</div>
                 )}
-                {manual.reserveUntil && (
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.56rem", color: "#F5C518", letterSpacing: "0.08em" }}>до {manual.reserveUntil}</div>
+                {soldier.reserveUntil && (
+                  <div className="font-mono text-xs text-[#F5C518] tracking-[0.08em]">до {soldier.reserveUntil}</div>
                 )}
               </div>
             </div>
 
-            {/* Avatar */}
-            <div style={{ width: 88, height: 88, background: "rgba(61,111,196,0.06)", border: "1px solid rgba(61,111,196,0.2)", display: "flex", alignItems: "center", justifyContent: "center", clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)", flexShrink: 0 }}>
-              {manual.avatar ? (
-                <img src={manual.avatar} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div
+              className="w-24 h-24 bg-[var(--primary)]/[0.06] border border-[var(--primary)]/20 flex items-center justify-center shrink-0"
+              style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)" }}
+            >
+              {soldier.avatar && !avatarBroken ? (
+                <img
+                  src={soldier.avatar}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                  onError={() => setAvatarBroken(true)}
+                />
               ) : (
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.3rem", color: "rgba(61,111,196,0.25)" }}>CT</div>
+                <div className="font-mono text-2xl text-[var(--primary)]/25">CT</div>
               )}
             </div>
           </div>
 
-          {/* Rank bar */}
-          <RankBar rank={bot?.rank ?? "Рядовой-рекрут"} />
+          <RankBar rank={soldier.rank ?? "Рядовой-рекрут"} ranks={ranks} />
 
-          {/* Service data grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px", margin: "12px 0" }}>
-            <Field label="ЗВАНИЕ С" value={bot?.rankSince} mono />
+          <div className="grid grid-cols-2 gap-x-6 my-3">
+            <Field label="ЗВАНИЕ С" value={soldier.rankSince} mono />
             <Field label="ДНЕЙ В ЗВАНИИ" value={daysAtRank > 0 ? `${daysAtRank} дн.` : "—"} mono highlight />
-            <Field label="ДАТА ВСТУПЛЕНИЯ" value={manual.joinDate} mono />
-            <Field label="ВСЕГО ЧАСОВ" value={bot ? `${bot.online.totalHours}ч (${bot.online.sessions} сес.)` : "—"} mono highlight />
-            <Field label="ДОЛЖНОСТИ" value={manual.positions.join(", ")} />
-            <Field label="ОТРЯДЫ" value={manual.squads.join(", ")} />
-            {manual.attached.length > 0 && <Field label="ПРИКОМАНДИРОВАН" value={manual.attached.join(", ")} />}
+            <Field label="ДАТА ВСТУПЛЕНИЯ" value={soldier.joinDate} mono />
+            <Field
+              label="ВСЕГО ЧАСОВ"
+              value={soldier.onlineTotalHours ? `${soldier.onlineTotalHours}ч (${soldier.onlineSessions} сес.)` : "—"}
+              mono
+              highlight
+            />
+            <Field label="ДОЛЖНОСТИ" value={soldier.positions.join(", ")} />
+            <Field label="ОТРЯДЫ" value={soldier.squads.join(", ")} />
+            {soldier.attached && soldier.attached.length > 0 && (
+              <Field label="ПРИКОМАНДИРОВАН" value={soldier.attached.join(", ")} />
+            )}
           </div>
 
-          {/* Reprimands */}
-          <ReprimandBar count={manual.reprimands} frozen={manual.reprimandsFrozen} />
+          <ReprimandBar count={soldier.reprimands} frozen={soldier.reprimandsFrozen} />
 
-          {/* Medals */}
-          {manual.medals.length > 0 && (
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.18em", color: "rgba(143,163,192,0.45)", marginBottom: 8 }}>НАГРАДЫ</div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {manual.medals.map((medal, i) => (
+          {soldier.medals && soldier.medals.length > 0 && (
+            <div className="mb-4">
+              <div className="font-mono text-xs tracking-[0.18em] text-[var(--muted-foreground)]/50 mb-2">НАГРАДЫ</div>
+              <div className="flex gap-2 flex-wrap">
+                {soldier.medals.map((medalName: string, i: number) => (
                   <div
-                    key={i} title={medal.name}
-                    style={{ width: 42, height: 42, background: "rgba(61,111,196,0.08)", border: "1px solid rgba(61,111,196,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)", transition: "border-color 0.2s" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(61,111,196,0.5)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(61,111,196,0.2)"; }}
+                    key={i}
+                    title={medalName}
+                    className="px-2.5 py-1 bg-[var(--primary)]/[0.08] border border-[var(--primary)]/20 text-xs font-mono text-[var(--primary)] tracking-wider"
                   >
-                    {medal.image ? (
-                      <img src={medal.image} alt={medal.name} style={{ width: 28, height: 28, objectFit: "contain" }} />
-                    ) : (
-                      <span style={{ color: "#F5C518" }}>{medal.icon}</span>
-                    )}
+                    {medalName}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Recent sessions */}
-          {bot && bot.recentSessions.length > 0 && (
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", letterSpacing: "0.18em", color: "rgba(143,163,192,0.45)", marginBottom: 6 }}>ПОСЛЕДНИЕ СЕССИИ</div>
-              <div style={{ display: "flex", gap: 5 }}>
-                {bot.recentSessions.slice(0, 5).map((s, i) => (
-                  <div key={i} style={{ flex: 1, background: "rgba(8,13,23,0.8)", border: "1px solid var(--border)", padding: "5px 6px", textAlign: "center" }}>
-                    <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.52rem", color: "rgba(143,163,192,0.4)" }}>{s.date.slice(0, 5)}</div>
-                    <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--primary)" }}>{s.duration}</div>
+          {soldier.recentSessions && soldier.recentSessions.length > 0 && (
+            <div className="mb-4">
+              <div className="font-mono text-xs tracking-[0.18em] text-[var(--muted-foreground)]/50 mb-1.5">
+                ПОСЛЕДНИЕ СЕССИИ
+              </div>
+              <div className="flex gap-1.5">
+                {soldier.recentSessions.slice(0, 5).map((s, i) => (
+                  <div key={i} className="flex-1 bg-black/50 border border-[var(--border)] px-1.5 py-1.5 text-center">
+                    <div className="font-mono text-[0.65rem] text-[var(--muted-foreground)]/50">{s.date.slice(0, 5)}</div>
+                    <div className="font-mono text-sm text-[var(--primary)]">{s.duration}м</div>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Barcode row */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 14 }}>
-            <Barcode value={manual.cid} />
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.52rem", letterSpacing: "0.1em", color: "rgba(143,163,192,0.2)", textAlign: "right" }}>
+          <div className="flex justify-between items-end mb-4">
+            <Barcode value={soldier.cid} />
+            <div className="font-mono text-xs tracking-[0.1em] text-[var(--muted-foreground)]/25 text-right">
               <div>GAR-501-EAL</div>
-              <div>REG: {manual.cid}</div>
+              <div>REG: {soldier.cid}</div>
             </div>
           </div>
 
-          {/* Copy buttons */}
-          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div className="border-t border-[var(--border)] pt-3.5 flex gap-2 flex-wrap">
             <CopyButton value={npzValue} label="КОПИРОВАТЬ НПЗ" />
             {steamId && <CopyButton value={steamId} label="КОПИРОВАТЬ STEAMID" />}
+            {discordId && <CopyButton value={discordId} label="КОПИРОВАТЬ DISCORDID" />}
           </div>
         </div>
       </div>

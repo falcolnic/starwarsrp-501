@@ -1,4 +1,4 @@
-import { Outlet, ScrollRestoration } from "react-router";
+import { Outlet } from "react-router";
 import { Navbar } from "./layout/Navbar";
 import { Footer } from "./layout/Footer";
 
@@ -9,11 +9,10 @@ export function Layout() {
       style={{ background: "var(--background)", color: "var(--foreground)" }}
     >
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
       <Footer />
-      <ScrollRestoration />
     </div>
   );
 }

@@ -11,7 +11,6 @@ import { homeTabs } from "../../data/homeTabs";
 import { GlitchText } from "../components/GlitchText";
 import { InfoTicker } from "../components/ui/InfoTicker";
 import { BlacklistModal } from "../components/BlackListModal";
-import { R2D2Peeker } from "../components/ui/R2D2Peeker";
 
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";
@@ -24,7 +23,7 @@ export function Home() {
   
   const [isBlacklistOpen, setIsBlacklistOpen] = useState(false);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!heroRef.current) return;
     const rect = heroRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -37,11 +36,11 @@ export function Home() {
   return (
     <div>
       <section 
+        onMouseMove={handleMouseMove}
         className="group min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6 bg-[#080d17]"
       >
         <div 
           ref={heroRef}
-          onMouseMove={handleMouseMove}
           className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[66.66vw] min-h-[100vh] min-w-[150vh] pointer-events-auto select-none overflow-hidden z-0"
         >
           <div className="absolute inset-0 pointer-events-none bg-[url('/hero-bg.png')] bg-cover bg-center opacity-90 brightness-110 contrast-105" />
@@ -72,7 +71,7 @@ export function Home() {
           </div>
 
           <div className="anim-fade-up text-center max-w-4xl [animation-delay:150ms]">
-            <div className="anim-flicker font-mono text-base tracking-widest text-[var(--primary)] mb-3">
+            <div className="anim-flicker font-mono text-xl tracking-widest text-[var(--primary)] mb-3">
               ГАЛАКТИЧЕСКАЯ РЕСПУБЛИКА · ВЕЛИКАЯ АРМИЯ · СПЕЦИАЛЬНЫЕ ОПЕРАЦИИ
             </div>
 
@@ -135,7 +134,6 @@ export function Home() {
 
       <div className="relative">
         <InfoTicker />
-        <R2D2Peeker />
       </div>
 
       <div className="max-w-6xl mx-auto pt-0 px-6 pb-24">

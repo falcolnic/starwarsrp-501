@@ -10,6 +10,7 @@ import { MapViewer } from "./components/map/MapViewer";
 import { Zergs } from "./pages/Zergs";
 import { Droids } from "./pages/Droids";
 import { Equipment } from "./pages/Equipment";
+import { Positions } from "./pages/Positions";
 import { DatabaseLayout } from "./components/database/DatabaseLayout";
 import { PromotionRulesPage } from "./pages/PromotionRulesPage";
 import { ErrorPage } from "./pages/ErrorPage";
@@ -41,7 +42,7 @@ export const router = createBrowserRouter([
     path: "/",
     Component: Layout,
     loader: async () => {
-await Promise.all([
+      await Promise.all([
         document.fonts.ready,
         document.fonts.load("1em Mandalorian"),
         ...CRITICAL_IMAGES.map((url) => preloadImage(url)),
@@ -57,6 +58,7 @@ await Promise.all([
       { path: "promotion/rules", Component: PromotionRulesPage },
       { path: "map", Component: MapViewer },
       { path: "commanders", Component: Commanders },
+      { path: "positions", Component: Positions },
       { 
         Component: DatabaseLayout,
         children: [

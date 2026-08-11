@@ -56,7 +56,7 @@ export function Commanders() {
                 </div>
             </section>
 
-            <div className="py-16 bg-[#080d17]">
+            <div className="pb-8 bg-[#080d17]">
                 <CommandersRegistry />
             </div>
         </div>

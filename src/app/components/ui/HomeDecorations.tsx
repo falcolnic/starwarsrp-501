@@ -14,10 +14,10 @@ export function SectionDecor() {
 
 export function CornerDecoration({ position }: { position: "top-left" | "top-right" | "bottom-left" | "bottom-right" }) {
     const variants = {
-        "top-left":     "top-[20px] left-[20px] border-t-2 border-l-2",
-        "top-right":    "top-[20px] right-[20px] border-t-2 border-r-2",
-        "bottom-left":  "bottom-[60px] left-[20px] border-b-2 border-l-2",
-        "bottom-right": "bottom-[60px] right-[20px] border-b-2 border-r-2",
+        "top-left":     "top-[10px] left-[0px] border-t-2 border-l-2",
+        "top-right":    "top-[10px] right-[0px] border-t-2 border-r-2",
+        "bottom-left":  "bottom-[80px] left-[0px] border-b-2 border-l-2",
+        "bottom-right": "bottom-[80px] right-[0px] border-b-2 border-r-2",
     };
 
     return (
