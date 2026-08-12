@@ -1,16 +1,15 @@
 import { useState } from "react";
 
-// Пример правильной структуры данных для архива
 interface CommanderEntry {
-  order: number;
-  idNumber: string;
-  callsign: string;
-  km: string;
+    order: number;
+    idNumber: string;
+    callsign: string;
+    km: string;
 }
 
 interface EraData {
-  period: string;
-  entries: CommanderEntry[];
+    period: string;
+    entries: CommanderEntry[];
 }
 
 const ARCHIVE_DATA: Record<string, EraData[]> = {
@@ -306,7 +305,7 @@ export function CommandersRegistry() {
                 <table className="w-full text-left border-collapse mt-2">
                 <thead>
                     <tr className="border-b border-slate-800 text-xs text-slate-500 uppercase tracking-wider">
-                    <th className="pb-2 font-normal w-12">Поряд.</th>
+                    <th className="pb-2 font-normal w-12">#</th>
                     <th className="pb-2 font-normal w-16">Номер</th>
                     <th className="pb-2 font-normal">Позывной</th>
                     </tr>
@@ -322,7 +321,7 @@ export function CommandersRegistry() {
                         {String(entry.order).padStart(2, "0")}
                         </td>
                         <td className="py-2.5 text-slate-400 font-medium group-hover:text-white">
-                        #{entry.idNumber}
+                        {entry.idNumber}
                         </td>
                         <td className="py-2.5 text-slate-200 font-bold tracking-wide italic group-hover:text-[#3D6FC4]">
                         {entry.callsign}
@@ -335,11 +334,9 @@ export function CommandersRegistry() {
             ))}
         </div>
 
-        {/* 3. МОДАЛЬНОЕ ОКНО ДЕТАЛИЗАЦИИ (ЗДЕСЬ ПОКАЗЫВАЕМ КМ) */}
         {selectedCommander && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+            <div className="fixed inset-0 z-5 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
             <div className="w-full max-w-md bg-[#0d1829] border border-slate-700 p-6 relative shadow-2xl">
-                {/* Кнопка закрытия */}
                 <button 
                 onClick={() => setSelectedCommander(null)}
                 className="absolute top-4 right-4 text-slate-500 hover:text-white bg-transparent border-none cursor-pointer text-sm"
@@ -364,7 +361,6 @@ export function CommandersRegistry() {
                     <span className="text-emerald-400 font-bold uppercase tracking-wider">В архиве легиона</span>
                 </div>
                 
-                {/* Показываем секретное поле КМ только тут */}
                 <div className="flex justify-between bg-[#3D6FC4]/5 p-2 border-l-2 border-[#3D6FC4] mt-4">
                     <span className="text-slate-400 uppercase font-bold">Управляющий (КМ):</span>
                     <span className="text-white font-bold tracking-wide">{selectedCommander.km}</span>

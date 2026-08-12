@@ -20,7 +20,7 @@ export function Navbar() {
 
     return (
         <nav
-        className="sticky top-0 z-15 border-b border-slate-800/80 shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
+        className="sticky top-0 z-20 border-b border-slate-800/80 shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
         style={{
             background: "linear-gradient(180deg, #080d17 0%, #0d1829 100%)",
         }}

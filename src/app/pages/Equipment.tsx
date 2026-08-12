@@ -51,7 +51,7 @@ export function Equipment() {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto  py-10 flex flex-col gap-8 text-white">
+        <div className="max-w-[1400px] mx-auto py-10 flex flex-col gap-8 text-white">
             
             <div className="border-b border-[var(--border)]/30 pb-4">
                 <h1
@@ -190,7 +190,7 @@ export function Equipment() {
                             </div>
                             <div className="relative flex-1 w-full overflow-hidden flex">
                                 <img 
-                                    src="/armour.png" 
+                                    src="/docs/armour.png" 
                                     alt="В.А.Р. Броня чертеж" 
                                     className="max-w-full h-full object-contain invert mix-blend-screen filter brightness-95 contrast-105"
                                     onError={(e) => {
@@ -257,7 +257,7 @@ export function Equipment() {
                             </div>
                             <div className="flex-1 flex items-center justify-center">
                                 <img 
-                                    src="/helmet.png" 
+                                    src="/docs/helmet.png" 
                                     alt="В.А.Р. Шлем чертеж" 
                                     className="max-h-full max-w-full invert mix-blend-screen object-contain filter brightness-90 contrast-105"
                                     onError={(e) => {
@@ -281,7 +281,6 @@ export function Equipment() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                     <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col">
                         <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
                             <Layers size={14} className="text-[var(--primary)]" />
@@ -290,61 +289,70 @@ export function Equipment() {
                         <div className="p-4 flex-1 flex flex-col md:flex-row gap-4">
                             <div className="flex-1 space-y-2 text-sm font-mono text-slate-400 leading-relaxed">
                                 <p>Служит преимущественно в качестве <strong className="text-white">средства тактического обозначения звания</strong> и принадлежности к подразделению, нежели сугубо для защиты плеча.</p>
-                                <p>Обычно изготавливается из той же броневой пластины, однако может обладать иными модифицирующими материалами в зависимости от климатических задач.</p>
+                                <p>Ообычно изготавливается из той же броневой пластины, однако может обладать иными модифицирующими материалами в зависимости от климатических задач.</p>
                             </div>
-                            <div className="w-full md:w-32 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-2">
-                                <img src="/images/pauldron.png" alt="Наплечник" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                            <div className="w-full md:w-36 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-1">
+                                <img src="/docs/pauldron.png" alt="Наплечник" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col">
+                        <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
+                            <Layers size={14} className="text-[var(--primary)]" />
+                            <span className="font-display font-bold text-base uppercase tracking-wider">Шейная бронепластина (Галлера)</span>
+                        </div>
+                        <div className="p-4 flex-1 flex flex-col md:flex-row gap-4">
+                            <div className="flex-1 space-y-2 text-sm font-mono text-slate-400 leading-relaxed">
+                                <p>Галера представляет собой композитный барьерный элемент — промежуточное тактическое решение между базовой броней и нательным костюмом (ЧНК).</p>
+                                <p>Уровень прочности уступает стандартным броневым пластинам, однако надежно превосходит ЧНК. Прочная укладка нитей снижает вероятность пробития осколками, страхуя уязвимые кровеносные артерии шеи от осколочного ранения.</p>
+                                <p className="text-amber-400/90 font-semibold">Важно: Плотность прессовки ухудшает вентиляцию и теплообмен, из-за чего теплоотдача тела клона в окружающую среду замедляется.</p>
+                            </div>
+                            <div className="w-full md:w-36 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-2">
+                                <img src="/docs/gorget.png" alt="Галлера" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                             </div>
                         </div>
                     </div>
 
                     <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col md:col-span-2">
                         <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
-                            <Layers size={14} className="text-[var(--primary)]" />
-                            <span className="font-display font-bold text-base uppercase tracking-wider">Шейная бронепластина (Галлера)</span>
-                        </div>
-                        <div className="p-4 space-y-4">
-                            <div className="text-sm font-mono text-slate-400 leading-relaxed space-y-2">
-                                <p>Галера представляет собой композитный барьерный элемент — промежуточное тактическое решение между базовой броней и нательным костюмом (ЧНК).</p>
-                                <p>Уровень прочности уступает стандартным броневым пластинам, однако надежно превосходит ЧНК. Прочная укладка нитей снижает вероятность пробития осколками, страхуя уязвимые кровеносные артерии шеи от осколочного ранения.</p>
-                                <p className="text-amber-400/90 font-semibold">Важно: Плотность прессовки ухудшает вентиляцию и теплообмен, из-за чего теплоотдача тела клона в окружающую среду замедляется.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                                <div className="border border-slate-800/80 rounded bg-[#080d17]/40 p-3 flex flex-col items-center gap-2">
-                                    <span className="font-mono text-[10px] text-slate-400 uppercase">Положение: Спущенный</span>
-                                    <div className="w-full h-32 border border-slate-900 rounded bg-slate-950 flex items-center justify-center p-2">
-                                        <img src="/images/gorget-down.png" alt="Галлера Спущенный" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-                                    </div>
-                                </div>
-                                <div className="border border-slate-800/80 rounded bg-[#080d17]/40 p-3 flex flex-col items-center gap-2">
-                                    <span className="font-mono text-[10px] text-[var(--primary)] uppercase">Положение: Приподнятый</span>
-                                    <div className="w-full h-32 border border-slate-900 rounded bg-slate-950 flex items-center justify-center p-2">
-                                        <img src="/images/gorget-up.png" alt="Галлера Приподнятый" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 3. Визор */}
-                    <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col">
-                        <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
                             <Eye size={14} className="text-[var(--primary)]" />
                             <span className="font-display font-bold text-base uppercase tracking-wider">Визор (Дополнительный щиток)</span>
                         </div>
-                        <div className="p-4 flex-1 flex flex-col md:flex-row gap-4">
-                            <div className="flex-1 space-y-2 text-sm font-mono text-slate-400 leading-relaxed">
+                        <div className="p-4 space-y-4">
+                            <div className="text-sm font-mono text-slate-400 leading-relaxed space-y-2">
                                 <p>Защитный прозрачный барьер для глаз. Фильтрует внешнее ультрафиолетовое и лазерное излучение, страхует оптический блок шлема от шрапнельной пыли и мелкокалиберных осколков.</p>
                                 <p>Интегрируется с портативными ПК для дублирования графических карт на сетчатке и обеспечивает тактическую анонимность бойца.</p>
                             </div>
-                            <div className="w-full md:w-32 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-2">
-                                <img src="/images/visor.png" alt="Дополнительный визор" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+
+                            <div className="flex flex-wrap justify-center items-center gap-36 pt-2">
+                                <div className="border border-slate-800/80 rounded bg-[#080d17]/40 p-3 flex flex-col items-center gap-2 w-full sm:w-auto">
+                                    <span className="font-mono text-xs text-slate-400 uppercase">Положение: Поднятый</span>
+                                    <div className="w-full sm:w-76 h-38 border border-slate-900 rounded bg-slate-950 flex items-center justify-center p-3">
+                                        <img 
+                                            src="/docs/visor-up.png" 
+                                            alt="Визор Поднятый" 
+                                            className="max-h-full max-w-full object-contain" 
+                                            onError={(e) => { e.currentTarget.style.display = "none"; }} 
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="border border-slate-800/80 rounded bg-[#080d17]/40 p-3 flex flex-col items-center gap-2 w-full sm:w-auto">
+                                    <span className="font-mono text-xs text-[var(--primary)] uppercase">Положение: Опущенный</span>
+                                    <div className="w-full sm:w-76 h-38 border border-slate-900 rounded bg-slate-950 flex items-center justify-center p-3">
+                                        <img 
+                                            src="/docs/visor-down.png" 
+                                            alt="Визор Опущенный" 
+                                            className="max-h-full max-w-full object-contain" 
+                                            onError={(e) => { e.currentTarget.style.display = "none"; }} 
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* 4. Солнцезащитный козырек */}
                     <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col">
                         <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
                             <Sun size={14} className="text-[var(--primary)]" />
@@ -356,12 +364,27 @@ export function Equipment() {
                                 <p>В некоторых батальонах и взводах используется как элемент визуального отличия званий.</p>
                             </div>
                             <div className="w-full md:w-32 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-2">
-                                <img src="/images/sun-shield.png" alt="Козырек" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                                <img src="/docs/sun-shield.png" alt="Козырек" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                             </div>
                         </div>
                     </div>
 
-                    {/* 5. Рюкзак */}
+                    <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col">
+                        <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
+                            <Compass size={14} className="text-[var(--primary)]" />
+                            <span className="font-display font-bold text-base uppercase tracking-wider">Дальномер (Антенна)</span>
+                        </div>
+                        <div className="p-4 flex-1 flex flex-col md:flex-row gap-4">
+                            <div className="flex-1 space-y-2 text-sm font-mono text-slate-400 leading-relaxed">
+                                <p>Устройство оптического приближения удаленных целей с одновременным выводом физических телеметрических данных (дистанция, скорость движения цели, габариты).</p>
+                                <p>При сопряжении с внешним командирским биноклем дает глубокий функционал, позволяющий захватывать и отслеживать цели через тонкие препятствия (стены, возвышения рельефа).</p>
+                            </div>
+                            <div className="w-full md:w-32 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-2">
+                                <img src="/docs/rangefinder.png" alt="Дальномер" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col md:col-span-2">
                         <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
                             <Luggage size={14} className="text-[var(--primary)]" />
@@ -390,42 +413,47 @@ export function Equipment() {
                                 </div>
                             </div>
                             <div className="w-full lg:w-48 h-48 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-3 align-self-center">
-                                <img src="/images/backpack.png" alt="Тактический рюкзак" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                                <img src="/docs/backpack.png" alt="Тактический рюкзак" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                             </div>
                         </div>
                     </div>
 
-                    {/* 6. Кама */}
-                    <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col">
+                    <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col md:col-span-2">
                         <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
                             <Layers size={14} className="text-[var(--primary)]" />
                             <span className="font-display font-bold text-base uppercase tracking-wider">Кама (Тактическая юбка)</span>
                         </div>
-                        <div className="p-4 flex-1 flex flex-col md:flex-row gap-4">
-                            <div className="flex-1 space-y-2 text-sm font-mono text-slate-400 leading-relaxed">
+                        <div className="p-4 space-y-4">
+                            <div className="text-sm font-mono text-slate-400 leading-relaxed space-y-2">
                                 <p>Гибкая кожаная броня, крепящаяся на талии. Изготавливается из прочной, обработанной салластанской или кореллианской кожи.</p>
                                 <p>Предохраняет ноги бойца от случайной шрапнели, осколков и обратных реактивных потоков при прыжках на джетпаках или вождении реактивной техники.</p>
                                 <p>Является известным визуальным маркером ранга и принадлежности к элите (ARC).</p>
                             </div>
-                            <div className="w-full md:w-32 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-2">
-                                <img src="/images/kama.png" alt="Кама" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* 7. Дальномер */}
-                    <div className="bg-[#0c1424]/40 border border-[var(--border)]/30 rounded overflow-hidden flex flex-col">
-                        <div className="px-4 py-2.5 bg-[#080d17]/80 border-b border-slate-800 flex items-center gap-2">
-                            <Compass size={14} className="text-[var(--primary)]" />
-                            <span className="font-display font-bold text-base uppercase tracking-wider">Дальномер (Антенна)</span>
-                        </div>
-                        <div className="p-4 flex-1 flex flex-col md:flex-row gap-4">
-                            <div className="flex-1 space-y-2 text-sm font-mono text-slate-400 leading-relaxed">
-                                <p>Устройство оптического приближения удаленных целей с одновременным выводом физических телеметрических данных (дистанция, скорость движения цели, габариты).</p>
-                                <p>При сопряжении с внешним командирским биноклем дает глубокий функционал, позволяющий захватывать и отслеживать цели через тонкие препятствия (стены, возвышения рельефа).</p>
-                            </div>
-                            <div className="w-full md:w-32 h-32 border border-slate-800 rounded bg-slate-950/60 shrink-0 flex items-center justify-center p-2">
-                                <img src="/images/rangefinder.png" alt="Дальномер" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                            <div className="flex flex-wrap justify-center items-center gap-36 pt-2">
+                                <div className="border border-slate-800/80 rounded bg-[#080d17]/40 p-3 flex flex-col items-center gap-2 w-full sm:w-auto">
+                                    <span className="font-mono text-xs text-slate-400 uppercase">Вариант: Стандартная</span>
+                                    <div className="w-full sm:w-60 h-58 border border-slate-900 rounded bg-slate-950 flex items-center justify-center p-3">
+                                        <img 
+                                            src="/docs/kama.png" 
+                                            alt="Стандартная Кама" 
+                                            className="max-h-full max-w-full object-contain" 
+                                            onError={(e) => { e.currentTarget.style.display = "none"; }} 
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="border border-slate-800/80 rounded bg-[#080d17]/40 p-3 flex flex-col items-center gap-2 w-full sm:w-auto">
+                                    <span className="font-mono text-xs text-[var(--primary)] uppercase">Вариант: С плащом</span>
+                                    <div className="w-full sm:w-60 h-58 border border-slate-900 rounded bg-slate-950 flex items-center justify-center p-3">
+                                        <img 
+                                            src="/docs/kama-cloak.png" 
+                                            alt="Кама с плащом" 
+                                            className="max-h-full max-w-full object-contain" 
+                                            onError={(e) => { e.currentTarget.style.display = "none"; }} 
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

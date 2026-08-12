@@ -16,17 +16,35 @@ import { useRanks, useRankRequirements } from "../../hooks/useRanks";
 import type { DbRank } from "../../services/rankService";
 
 const RANK_SKINS: Record<string, string> = {
-    "Рядовой": "/images/ranks/ct-trooper.png",
-    "Старший рядовой": "/images/ranks/ct-senior.png",
-    "Специалист": "/images/ranks/ct-specialist.png",
-    "Капрал": "/images/ranks/ct-corporal.png",
-    "Сержант": "/images/ranks/ct-sergeant.png",
+    "Рядовой-рекрут": "/ranks/ct-recruiting.png",
+    "Рядовой": "/ranks/ct-trooper.png",
+    "Старший рядовой": "/ranks/ct-senior.png",
+    "Специалист": "/ranks/ct-specialist.png",
+    "Капрал": "/ranks/ct-corporal.png",
+    "Сержант": "/ranks/ct-sergeant.png",
+    "Штаб-сержант": "/ranks/ct-staff-sergeant.png",
+    "Сержант первого класса": "/ranks/ct-sfc.png",
+    "Мастер сержант": "/ranks/ct-master-sergeant.png",
+    "Первый сержант": "/ranks/ct-first-sergeant.png",
+    "Сержант-майор": "/ranks/ct-sergeant-major.png",
+    "Команд сержант-майор": "/ranks/ct-command-sgt-major.png",
+    "Сержант-майор сухопутных войск": "/ranks/ct-sgt-major-army.png",
+    "Младший лейтенант": "/ranks/ct-junior-lt.png",
+    "Лейтенант": "/ranks/ct-lieutenant.png",
+    "Капитан": "/ranks/ct-captain.png",
+    "Майор": "/ranks/ct-major.png",
+    "Подполковник": "/ranks/ct-lt-colonel.png",
+    "Полковник": "/ranks/ct-colonel.png",
+    "Командир": "/ranks/ct-commander.png",
+    "Командир первого класса": "/ranks/ct-commander-1st.png",
+    "Клон Коммандер": "/ranks/ct-clone-commander.png",
+    "Клон Маршал": "/ranks/ct-clone-marshal.png",
 };
 
 const RANK_GROUPS_DEF = [
     {
         title: "Рядовой Состав",
-        names: ["Рядовой-рекрут", "Курсант", "Рядовой", "Старший рядовой"],
+        names: ["Рядовой-рекрут", "Рядовой", "Старший рядовой"],
     },
     {
         title: "Младший сержантский состав",
@@ -54,7 +72,7 @@ const RANK_GROUPS_DEF = [
     },
     {
         title: "Командирский состав",
-        names: ["Командир", "Командир первого класса", "Клон Коммандер", "Клон маршал", "Клон Маршал"],
+        names: ["Командир", "Командир первого класса", "Клон Коммандер", "Клон Маршал"],
     },
 ];
 
@@ -62,13 +80,17 @@ export function PromotionRulesPage() {
     const { ranks, loading: ranksLoading } = useRanks();
     const [selectedRank, setSelectedRank] = useState<DbRank | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
-    // Set initial selected rank once ranks are loaded
     useEffect(() => {
         if (ranks.length > 0 && !selectedRank) {
             setSelectedRank(ranks[0]);
         }
     }, [ranks, selectedRank]);
+
+    useEffect(() => {
+        setImageError(false);
+    }, [selectedRank]);
 
     const { requirements, loading: reqsLoading } = useRankRequirements(selectedRank?.id ?? null);
 
@@ -101,7 +123,7 @@ export function PromotionRulesPage() {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
                     <div className="flex items-center gap-4">
-                        <Link to="/promotion" className="p-2 border border-slate-800 hover:border-slate-700 bg-slate-900/20 text-slate-400 hover:text-white transition-colors">
+                        <Link to="/promotion" className="p-2 border border-slate-800 hover:border-slate-700 bg-slate-900/20 text-slate-400 hover:text-white transition-colors cursor-pointer">
                             <ArrowLeft size={20} />
                         </Link>
 
@@ -131,11 +153,10 @@ export function PromotionRulesPage() {
                     </div>
                 </div>
 
-                {/* Mobile Selector */}
                 <div className="md:hidden relative">
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="w-full flex items-center justify-between px-4 py-3 border border-slate-800 bg-slate-900/40 text-base font-bold text-white uppercase tracking-wider"
+                        className="w-full flex items-center justify-between px-4 py-3 border border-slate-800 bg-slate-900/40 text-base font-bold text-white uppercase tracking-wider cursor-pointer"
                     >
                         <span>Звание: {selectedRank?.name ?? "—"}</span>
                         <ChevronDown size={16} />
@@ -155,10 +176,10 @@ export function PromotionRulesPage() {
                                                 setSelectedRank(rank);
                                                 setIsMobileMenuOpen(false);
                                             }}
-                                            className={`w-full text-left px-3 py-2 text-xs uppercase tracking-wider ${
+                                            className={`w-full text-left px-3 py-2 text-xs uppercase tracking-wider cursor-pointer ${
                                                 selectedRank?.id === rank.id 
                                                     ? "bg-[var(--primary)]/10 text-[var(--primary)] font-bold" 
-                                                    : "text-slate-400"
+                                                    : "text-slate-400 hover:bg-slate-900/40"
                                             }`}
                                         >
                                             {rank.name}
@@ -182,27 +203,30 @@ export function PromotionRulesPage() {
                                         {group.title}
                                     </h3>
                                     <div className="flex flex-col gap-1 border-l border-slate-900 pl-2 ml-1">
-                                        {group.ranks.map((rank) => (
-                                            <button
-                                                key={rank.id}
-                                                onClick={() => setSelectedRank(rank)}
-                                                className={`group flex items-center justify-between w-full text-left py-1.5 px-2 text-xs sm:text-sm transition-all uppercase tracking-wider ${
-                                                    selectedRank?.id === rank.id
-                                                        ? "bg-[var(--primary)]/10 text-white font-bold border-l-2 border-[var(--primary)]"
-                                                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/30"
-                                                }`}
-                                            >
-                                                <span>{rank.name}</span>
-                                                <ChevronRight size={12} className={selectedRank?.id === rank.id ? "text-[var(--primary)]" : "opacity-0 group-hover:opacity-100"} />
-                                            </button>
-                                        ))}
+                                        {group.ranks.map((rank) => {
+                                            const isSelected = selectedRank?.id === rank.id;
+
+                                            return (
+                                                <button
+                                                    key={rank.id}
+                                                    onClick={() => setSelectedRank(rank)}
+                                                    className={`group flex items-center justify-between w-full text-left py-1.5 px-2 text-xs sm:text-sm transition-all uppercase tracking-wider cursor-pointer ${
+                                                        isSelected
+                                                            ? "bg-[var(--primary)]/10 text-white font-bold border-l-2 border-[var(--primary)]"
+                                                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/30"
+                                                    }`}
+                                                >
+                                                    <span className="truncate">{rank.name}</span>
+                                                    <ChevronRight size={12} className={isSelected ? "text-[var(--primary)] shrink-0" : "opacity-0 group-hover:opacity-100 shrink-0"} />
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </aside>
 
-                    {/* Main Content Area */}
                     <main className="md:col-span-8 lg:col-span-9 border border-slate-800 bg-slate-950/10 p-5 sm:p-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
                             <div>
@@ -211,7 +235,7 @@ export function PromotionRulesPage() {
                                     {selectedRank?.name ?? "—"}
                                 </h2>
                             </div>
-                            <span className="text-sm font-bold uppercase tracking-widest text-[var(--primary)] border border-[var(--primary)]/30 bg-[var(--primary)]/5 px-3 py-1">
+                            <span className="text-sm font-bold uppercase tracking-widest text-[var(--primary)] border border-[var(--primary)]/30 bg-[var(--primary)]/5 px-3 py-1 self-start sm:self-auto">
                                 РЕГЛАМЕНТ В.А.Р.
                             </span>
                         </div>
@@ -264,7 +288,6 @@ export function PromotionRulesPage() {
                                 )}
                             </div>
 
-                            {/* Equipment Card */}
                             <div className="lg:col-span-4 space-y-3">
                                 <div className="text-xs font-bold uppercase tracking-widest text-slate-500 pb-1 border-b border-slate-900">
                                     Визуальный ID // Экипировка
@@ -273,18 +296,23 @@ export function PromotionRulesPage() {
                                 <div className="border border-slate-800 bg-slate-950/30 aspect-[3/4] flex flex-col items-center justify-center p-4 relative overflow-hidden">
                                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-10 pointer-events-none" />
 
-                                    {skinUrl ? (
+                                    {skinUrl && !imageError ? (
                                         <img 
                                             src={skinUrl} 
                                             loading="lazy"
                                             alt={`Броня ${selectedRank?.name}`} 
                                             className="max-h-full object-contain z-10 transition-transform duration-300 hover:scale-105"
+                                            onError={() => setImageError(true)}
                                         />
                                     ) : (
                                         <div className="text-center z-10 space-y-2 p-4">
-                                            <Eye size={24} className="mx-auto text-slate-700 animate-pulse" />
-                                            <p className="text-sm text-slate-500 uppercase tracking-widest">Силуэт засекречен</p>
-                                            <p className="text-xs text-slate-600 uppercase">Нет доступных данных в архиве</p>
+                                            <Eye size={24} className="mx-auto text-amber-500/60 animate-pulse" />
+                                            <p className="text-sm text-amber-400/90 font-bold uppercase tracking-widest">
+                                                Изображение не загружено
+                                            </p>
+                                            <p className="text-xs text-slate-500 uppercase">
+                                                Файл отсутствует в архиве или недоступен
+                                            </p>
                                         </div>
                                     )}
 

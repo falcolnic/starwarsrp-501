@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { Layout } from "./components/Layout";
 import { WarpLoaderFallback } from "./components/warp/WarpLoaderFallback";
 import rosterRaw from "../data/roster.json";
@@ -15,6 +15,15 @@ import { DatabaseLayout } from "./components/database/DatabaseLayout";
 import { PromotionRulesPage } from "./pages/PromotionRulesPage";
 import { ErrorPage } from "./pages/ErrorPage";
 import { Commanders } from "./pages/Commanders";
+
+import { AdminAuthProvider } from "./admin/AdminAuthContext";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import { AdminLogin } from "./pages/admin/AdminLogin";
+import { AdminRanksPage } from "./pages/admin/AdminRanksPage";
+import { AdminBlacklistPage } from "./pages/admin/AdminBlacklistPage";
+import { AdminRosterPage } from "./pages/admin/AdminRosterPage";
+import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
+
 
 const MIN_LOADER_DURATION = 8000;
 
@@ -38,6 +47,23 @@ function preloadImage(url: string): Promise<void> {
 }
 
 export const router = createBrowserRouter([
+    {
+    path: "admin",
+    Component: AdminAuthProvider,
+    children: [
+      { path: "login", Component: AdminLogin },
+      {
+        Component: AdminLayout,
+        children: [
+          { index: true, element: <Navigate to="/admin/roster" replace /> },
+          { path: "roster", Component: AdminRosterPage },
+          { path: "ranks", Component: AdminRanksPage },
+          { path: "blacklist", Component: AdminBlacklistPage },
+          { path: "users", Component: AdminUsersPage },
+        ],
+      },
+    ],
+  },
   {
     path: "/",
     Component: Layout,

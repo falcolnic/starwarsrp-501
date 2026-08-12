@@ -70,10 +70,10 @@ export function Roster() {
   return (
     <div className="relative flex-1 flex flex-col">
       <div
-        className="absolute inset-0 z-10 bg-cover bg-center opacity-[0.7] pointer-events-none"
+        className="absolute inset-0 z-1 bg-cover bg-center opacity-[0.7] pointer-events-none"
         style={{ backgroundImage: "url('/topography.png')" }}
       />
-      <div className="min-w-6xl mx-auto py-10 pb-10 z-20">
+      <div className="min-w-6xl mx-auto py-10 pb-10 z-2">
         <div className="anim-fade-up mb-7">
           <div className="font-mono text-sm tracking-[0.22em] text-[var(--primary)] mb-2">
             501-Й Э.Ш.Л // БАЗА ДАННЫХ ЛИЧНОГО СОСТАВА

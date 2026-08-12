@@ -5,8 +5,117 @@ import { logAudit } from "../services/audit.service.js";
 import { createRank, updateRank, deleteRank } from "../services/rank.service.js";
 import { createDocument, updateDocument, deleteDocument } from "../services/document.service.js";
 import { getAllUsers, updateUserRole } from "../services/user.service.js";
+import { createSoldier, deleteSoldier, getAllSoldiers, updateSoldier, updateSoldierMedals } from "../services/soldiers.service.js";
 
 const router = Router();
+
+// ============ SOLDIERS ============
+const soldierCreateSchema = z.object({
+  cid: z.string().min(1).max(16),
+  steamId: z.string().nullable().optional(),
+  callsignOverride: z.string().nullable().optional(),
+  positions: z.array(z.string()).optional(),
+  squads: z.array(z.string()).optional(),
+  attached: z.array(z.string()).optional(),
+  medals: z.array(z.string()).optional(),
+  status: z.string().optional(),
+  joinDate: z.string().nullable().optional(),
+  discordId: z.string().nullable().optional(),
+  commandRole: z.string().nullable().optional(),
+  commandOrder: z.number().int().nullable().optional(),
+});
+
+router.get("/soldiers", requireRole("admin"), async (_req, res) => {
+  const list = await getAllSoldiers();
+  res.json(list);
+});
+
+router.post("/soldiers", requireRole("admin"), async (req, res) => {
+  const parsed = soldierCreateSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+
+  try {
+    const created = await createSoldier(parsed.data);
+    await logAudit({
+      userId: req.currentUser!.id,
+      action: "create",
+      entityType: "soldier",
+      entityId: parsed.data.cid,
+      after: created,
+    });
+    res.status(201).json(created);
+  } catch (err) {
+    if (err instanceof Error && err.message === "DUPLICATE_CID") {
+      return res.status(409).json({ error: "Боец с таким CID уже существует" });
+    }
+    throw err;
+  }
+});
+
+const soldierUpdateSchema = soldierCreateSchema.omit({ cid: true }).partial().extend({
+  reprimands: z.number().int().optional(),
+  reprimandsFrozen: z.boolean().optional(),
+  leaveUntil: z.string().nullable().optional(),
+  reserveUntil: z.string().nullable().optional(),
+  avatar: z.string().nullable().optional(),
+});
+
+router.patch("/soldiers/:cid", requireRole("admin"), async (req, res) => {
+  const parsed = soldierUpdateSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+
+  const result = await updateSoldier(req.params.cid, parsed.data);
+  if (!result) return res.status(404).json({ error: "Боец не найден" });
+
+  await logAudit({
+    userId: req.currentUser!.id,
+    action: "update",
+    entityType: "soldier",
+    entityId: req.params.cid,
+    before: result.before,
+    after: result.after,
+  });
+
+  res.json(result.after);
+});
+
+router.delete("/soldiers/:cid", requireRole("admin"), async (req, res) => {
+  const deleted = await deleteSoldier(req.params.cid);
+  if (!deleted) return res.status(404).json({ error: "Боец не найден" });
+
+  await logAudit({
+    userId: req.currentUser!.id,
+    action: "delete",
+    entityType: "soldier",
+    entityId: req.params.cid,
+    before: deleted,
+  });
+
+  res.json({ ok: true });
+});
+
+const medalsSchema = z.object({
+  medals: z.array(z.string()),
+});
+
+router.patch("/soldiers/:cid/medals", requireRole("admin"), async (req, res) => {
+  const parsed = medalsSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+
+  const result = await updateSoldierMedals(req.params.cid, parsed.data.medals);
+  if (!result) return res.status(404).json({ error: "Боец не найден" });
+
+  await logAudit({
+    userId: req.currentUser!.id,
+    action: "update",
+    entityType: "soldier_medals",
+    entityId: req.params.cid,
+    before: result.before.medals,
+    after: result.after.medals,
+  });
+
+  res.json(result.after);
+});
 
 // ============ RANKS (admin+) ============
 const rankSchema = z.object({

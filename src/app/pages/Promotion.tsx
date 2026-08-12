@@ -106,7 +106,7 @@ export function Promotion() {
           </button>
 
           {dropOpen && (
-            <div className="absolute top-[105%] left-0 right-0 bg-[#0d1829] border border-[var(--border)] rounded shadow-[0_8px_32px_rgba(0,0,0,0.6)] max-h-72 overflow-y-auto z-50">
+            <div className="absolute top-[105%] left-0 right-0 bg-[#0d1829] border border-[var(--border)] rounded shadow-[0_8px_32px_rgba(0,0,0,0.6)] max-h-72 overflow-y-auto z-1">
               {rosterManual.map((m) => {
                 const b = botMap.get(m.cid);
                 const cs = m.callsignOverride || b?.nickname || `CT-${m.cid}`;
