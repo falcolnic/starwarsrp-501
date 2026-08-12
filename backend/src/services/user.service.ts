@@ -4,7 +4,6 @@ import { users } from "../db/schema.js";
 
 export async function getAllUsers() {
   const rows = await db.select().from(users);
-  // passwordHash ніколи не повинен покидати бекенд
   return rows.map(({ passwordHash, ...rest }) => rest);
 }
 

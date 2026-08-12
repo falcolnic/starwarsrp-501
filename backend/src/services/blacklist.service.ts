@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { blacklist } from "../db/schema.js";
+import { desc, eq } from "drizzle-orm";
 
 export async function getAllBlacklistEntries() {
     return db.select().from(blacklist);
@@ -15,7 +15,7 @@ export async function createBlacklistEntry(data: {
     addedDate: string;
     workoff: string;
     status?: "TRIALS" | "EXILED" | "BANNED";
-}) {
+    }) {
     const result = await db.insert(blacklist).values({
         number: data.number,
         callsign: data.callsign,
@@ -41,7 +41,7 @@ export async function updateBlacklistEntry(
         workoff: string;
         status: "TRIALS" | "EXILED" | "BANNED";
     }>
-) {
+    ) {
     const [before] = await db.select().from(blacklist).where(eq(blacklist.id, id)).limit(1);
     if (!before) return null;
 

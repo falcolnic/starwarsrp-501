@@ -72,28 +72,6 @@ export function Home() {
             <HeroEmblem />
           </div>
 
-          <div 
-            onClick={() => setIsGameOpen(true)}
-            className="relative group cursor-pointer border border-slate-800 rounded overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
-          >
-            <img 
-              src="/docs/tactical-overlay.png" 
-              alt="Tactical Overlay" 
-              className="w-full h-auto block"
-            />
-
-            {/* Hover Overlay */}
-            <div className="absolute inset-0 bg-[var(--primary)]/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="font-mono text-xs uppercase tracking-widest text-white bg-black/80 px-3 py-1.5 border border-[var(--primary)]">
-                ● ЗАПУСТИТЬ ТАКТИЧЕСКИЙ СИМУЛЯТОР
-              </span>
-            </div>
-          </div>
-
-          {/* 2. Render Tactical Command Center Modal */}
-          {isGameOpen && (
-            <TacticalCommandCenter onClose={() => setIsGameOpen(false)} />
-          )}
 
           <div className="anim-fade-up text-center max-w-4xl [animation-delay:150ms]">
             <div className="anim-flicker font-mono text-xl tracking-widest text-[var(--primary)] mb-3">

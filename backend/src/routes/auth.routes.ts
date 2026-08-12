@@ -2,65 +2,81 @@ import { Router } from "express";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { db } from "../db/client.js";
-import { users } from "../db/schema.js";
+import { soldiers, users } from "../db/schema.js";
 import { verifyCredentials, createSession, destroySession } from "../services/auth.service.js";
+import { buildSteamLoginUrl, verifySteamCallback, fetchSteamProfile } from "../services/steamAuth.service.js";
 import { SESSION_COOKIE_NAME } from "../middleware/auth.js";
+import { lookupPlayerBySteamId } from "../services/botClient.js";
 
 const router = Router();
 
-const getClientUrl = () => process.env.FRONTEND_ORIGIN || "http://localhost:5173";
+const getClientUrl = () => process.env.FRONTEND_ORIGIN || process.env.CLIENT_URL || "http://localhost:5173";
 
+// ============ STEAM AUTH INIT ============
 router.get("/steam", (req, res) => {
   const protocol = req.headers["x-forwarded-proto"] || req.protocol;
   const host = req.get("host");
-
   const backendOrigin = `${protocol}://${host}`;
-  const returnTo = `${backendOrigin}/api/auth/steam/callback`;
 
-  const params = new URLSearchParams({
-    "openid.ns": "http://specs.openid.net/auth/2.0",
-    "openid.mode": "checkid_setup",
-    "openid.return_to": returnTo,
-    "openid.realm": backendOrigin,
-    "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
-    "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
-  });
-
-  res.redirect(`https://steamcommunity.com/openid/login?${params.toString()}`);
+  const loginUrl = buildSteamLoginUrl(backendOrigin);
+  res.redirect(loginUrl);
 });
 
+// ============ STEAM AUTH CALLBACK ============
 router.get("/steam/callback", async (req, res) => {
   const clientUrl = getClientUrl();
 
   try {
     const rawQuery = req.originalUrl.split("?")[1] || "";
-    const params = new URLSearchParams(rawQuery);
-    params.set("openid.mode", "check_authentication");
-    const checkRes = await fetch("https://steamcommunity.com/openid/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
-    });
+    const steamId = await verifySteamCallback(rawQuery);
 
-    const checkText = await checkRes.text();
-    if (!checkText.includes("is_valid:true")) {
+    if (!steamId) {
       return res.redirect(`${clientUrl}/admin/login?error=steam_failed`);
     }
 
-    const claimedId = req.query["openid.claimed_id"] as string;
-    const match = claimedId?.match(/^https?:\/\/steamcommunity\.com\/openid\/id\/(\d+)$/);
-    const steamId = match ? match[1] : null;
+    const [existingUser] = await db.select().from(users).where(eq(users.steamId, steamId)).limit(1);
 
-    if (!steamId) {
-      return res.redirect(`${clientUrl}/admin/login?error=invalid_steam`);
+    let userId: number;
+    let userRole = "user";
+
+    if (existingUser) {
+      userId = existingUser.id;
+      userRole = existingUser.role;
+    } else {
+      const profile = await fetchSteamProfile(steamId);
+      const [insertResult] = await db.insert(users).values({
+        steamId,
+        displayName: profile?.personaName ?? `CT-${steamId.slice(-4)}`,
+        role: "user",
+      });
+      userId = insertResult.insertId;
     }
 
-    const [user] = await db.select().from(users).where(eq(users.steamId, steamId)).limit(1);
-    if (!user || (user.role !== "admin" && user.role !== "superadmin")) {
-      return res.redirect(`${clientUrl}/admin/login?error=not_authorized`);
-    }
+    const [existingSoldier] = await db.select().from(soldiers).where(eq(soldiers.steamId, steamId)).limit(1);
 
-    const { sessionId, expiresAt } = await createSession(user.id);
+    if (!existingSoldier) {
+      const botData = await lookupPlayerBySteamId(steamId).catch(() => null);
+
+      if (botData) {
+        await db.insert(soldiers).values({
+          cid: botData.cid,
+          steamId,
+          nickname: botData.nickname,
+          rank: botData.rank,
+          rankSince: botData.rankSince,
+          onlineTotalHours: botData.onlineTotalHours,
+          onlineSessions: botData.onlineSessions,
+          unitLevel: botData.unitLevel,
+          lastSyncedAt: new Date(),
+          positions: [],
+          squads: [],
+          attached: [],
+          medals: [],
+          status: "active",
+        });
+      }
+    }
+    const { sessionId, expiresAt } = await createSession(userId);
 
     res.cookie(SESSION_COOKIE_NAME, sessionId, {
       httpOnly: true,
@@ -69,13 +85,18 @@ router.get("/steam/callback", async (req, res) => {
       expires: expiresAt,
     });
 
-    res.redirect(`${clientUrl}/admin`);
+    if (userRole === "admin" || userRole === "superadmin") {
+      res.redirect(`${clientUrl}/admin`);
+    } else {
+      res.redirect(`${clientUrl}/roster`);
+    }
   } catch (err) {
     console.error("Steam auth error:", err);
     res.redirect(`${clientUrl}/admin/login?error=server_error`);
   }
 });
 
+// ============ FALLBACK USERNAME / PASSWORD LOGIN ============
 const loginSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1),
