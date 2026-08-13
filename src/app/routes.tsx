@@ -23,6 +23,8 @@ import { AdminRanksPage } from "./pages/admin/AdminRanksPage";
 import { AdminBlacklistPage } from "./pages/admin/AdminBlacklistPage";
 import { AdminRosterPage } from "./pages/admin/AdminRosterPage";
 import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
+import { AdminZergsPage } from "./pages/admin/AdminZergsPage";
+import { AdminDroidsPage } from "./pages/admin/AdminDroidsPage";
 
 
 const MIN_LOADER_DURATION = 8000;
@@ -60,6 +62,8 @@ export const router = createBrowserRouter([
           { path: "ranks", Component: AdminRanksPage },
           { path: "blacklist", Component: AdminBlacklistPage },
           { path: "users", Component: AdminUsersPage },
+          { path: "zergs", Component: AdminZergsPage },
+          { path: "droids", Component: AdminDroidsPage },
         ],
       },
     ],

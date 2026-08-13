@@ -1,5 +1,5 @@
 import { Navigate, NavLink, Outlet } from "react-router";
-import { Users, Shield, Ban, UserCog, LogOut } from "lucide-react";
+import { Users, Shield, Ban, UserCog, LogOut, Cpu, Bug } from "lucide-react";
 import { useAdminAuth } from "../../admin/AdminAuthContext";
 
 const NAV_ITEMS = [
@@ -7,6 +7,8 @@ const NAV_ITEMS = [
     { to: "/admin/ranks", label: "Звания и требования", icon: Shield, minRole: "admin" as const },
     { to: "/admin/blacklist", label: "Чёрный список", icon: Ban, minRole: "admin" as const },
     { to: "/admin/users", label: "Пользователи", icon: UserCog, minRole: "superadmin" as const },
+    { to: "/admin/zergs", label: "Зерги", icon: Bug, minRole: "admin" as const },
+    { to: "/admin/droids", label: "Дроиды", icon: Cpu, minRole: "admin" as const },
 ];
 
 export function AdminLayout() {

@@ -1,13 +1,20 @@
-import { useState, useMemo } from "react";
-import { zergs } from "../../data/zergs";
+import { useEffect, useState, useMemo } from "react";
+import type { ZergEntry } from "../../data/zergs";
 import { ZergCard } from "../components/database/ZergCard";
 
 export function Zergs() {
+    const [zergs, setZergs] = useState<ZergEntry[]>([]);
     const [query, setQuery] = useState("");
+
+    useEffect(() => {
+        fetch("/api/zergs")
+        .then((r) => r.json())
+        .then(setZergs);
+    }, []);
 
     const filtered = useMemo(
         () => zergs.filter((z) => z.name.toLowerCase().includes(query.toLowerCase())),
-        [query]
+        [query, zergs]
     );
 
     return (

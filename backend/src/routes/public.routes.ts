@@ -2,8 +2,9 @@ import { Router } from "express";
 import { getAllRanks, getRankRequirements } from "../services/rank.service.js";
 import { getAllDocuments } from "../services/document.service.js";
 import { getAllBlacklist } from "../services/blacklist.service.js";
-import { db } from "../db/client.js";
-import { soldiers } from "../db/schema.js";
+import { getAllZergs } from "../services/zerg.service.js";
+import { getAllDroids } from "../services/droid.service.js";
+import { getAllSoldiers } from "../services/soldiers.service.js";
 const router = Router();
 
 router.get("/ranks", async (_req, res) => {
@@ -12,8 +13,8 @@ router.get("/ranks", async (_req, res) => {
 });
 
 router.get("/soldiers", async (_req, res) => {
-  const allSoldiers = await db.select().from(soldiers);
-  res.json(allSoldiers);
+  const list = await getAllSoldiers();
+  res.json(await getAllSoldiers());
 });
 
 router.get("/ranks/:id/requirements", async (req, res) => {
@@ -34,6 +35,14 @@ router.get("/docs", async (_req, res) => {
 router.get("/blacklist", async (_req, res) => {
   const entries = await getAllBlacklist();
   res.json(entries);
+});
+
+router.get("/zergs", async (_req, res) => {
+  res.json(await getAllZergs());
+});
+
+router.get("/droids", async (_req, res) => {
+  res.json(await getAllDroids());
 });
 
 export default router;

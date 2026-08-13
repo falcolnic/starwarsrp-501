@@ -6,6 +6,8 @@ import { createRank, updateRank, deleteRank } from "../services/rank.service.js"
 import { createDocument, updateDocument, deleteDocument } from "../services/document.service.js";
 import { getAllUsers, updateUserRole } from "../services/user.service.js";
 import { createSoldier, deleteSoldier, getAllSoldiers, updateSoldier, updateSoldierMedals } from "../services/soldiers.service.js";
+import { createDroid, deleteDroid, updateDroid } from "../services/droid.service.js";
+import { createZerg, deleteZerg, updateZerg } from "../services/zerg.service.js";
 
 const router = Router();
 
@@ -264,6 +266,99 @@ router.patch("/users/:id/role", requireRole("superadmin"), async (req, res) => {
   });
 
   res.json(result.after);
+});
+
+const zergSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  danger: z.enum(["низкий", "средний", "высокий"]),
+  hp: z.number().int().positive(),
+  attacks: z.array(z.object({ type: z.string(), range: z.string(), damage: z.string() })),
+  recommendations: z.string().min(1),
+  description: z.string().min(1),
+  image: z.string().nullable().optional(),
+});
+
+router.post("/zergs", requireRole("admin"), async (req, res) => {
+  const parsed = zergSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+
+  try {
+    const created = await createZerg(parsed.data);
+    await logAudit({ userId: req.currentUser!.id, action: "create", entityType: "zerg", entityId: created.id, after: created });
+    res.status(201).json(created);
+  } catch (err) {
+    if (err instanceof Error && err.message === "DUPLICATE_ID") {
+      return res.status(409).json({ error: "Запись с таким id уже существует" });
+    }
+    throw err;
+  }
+});
+
+router.patch("/zergs/:id", requireRole("admin"), async (req, res) => {
+  const parsed = zergSchema.omit({ id: true }).partial().safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+
+  const result = await updateZerg(req.params.id, parsed.data);
+  if (!result) return res.status(404).json({ error: "Запись не найдена" });
+
+  await logAudit({ userId: req.currentUser!.id, action: "update", entityType: "zerg", entityId: req.params.id, before: result.before, after: result.after });
+  res.json(result.after);
+});
+
+router.delete("/zergs/:id", requireRole("admin"), async (req, res) => {
+  const deleted = await deleteZerg(req.params.id);
+  if (!deleted) return res.status(404).json({ error: "Запись не найдена" });
+
+  await logAudit({ userId: req.currentUser!.id, action: "delete", entityType: "zerg", entityId: req.params.id, before: deleted });
+  res.json({ ok: true });
+});
+
+const droidSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  hp: z.number().int().positive(),
+  weapon: z.string().min(1),
+  defenseLevel: z.string().min(1),
+  dangerLevel: z.string().min(1),
+  tactics: z.string().min(1),
+  features: z.string().min(1),
+  image: z.string().nullable().optional(),
+});
+
+router.post("/droids", requireRole("admin"), async (req, res) => {
+  const parsed = droidSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+
+  try {
+    const created = await createDroid(parsed.data);
+    await logAudit({ userId: req.currentUser!.id, action: "create", entityType: "droid", entityId: created.id, after: created });
+    res.status(201).json(created);
+  } catch (err) {
+    if (err instanceof Error && err.message === "DUPLICATE_ID") {
+      return res.status(409).json({ error: "Запись с таким id уже существует" });
+    }
+    throw err;
+  }
+});
+
+router.patch("/droids/:id", requireRole("admin"), async (req, res) => {
+  const parsed = droidSchema.omit({ id: true }).partial().safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+
+  const result = await updateDroid(req.params.id, parsed.data);
+  if (!result) return res.status(404).json({ error: "Запись не найдена" });
+
+  await logAudit({ userId: req.currentUser!.id, action: "update", entityType: "droid", entityId: req.params.id, before: result.before, after: result.after });
+  res.json(result.after);
+});
+
+router.delete("/droids/:id", requireRole("admin"), async (req, res) => {
+  const deleted = await deleteDroid(req.params.id);
+  if (!deleted) return res.status(404).json({ error: "Запись не найдена" });
+
+  await logAudit({ userId: req.currentUser!.id, action: "delete", entityType: "droid", entityId: req.params.id, before: deleted });
+  res.json({ ok: true });
 });
 
 export default router;

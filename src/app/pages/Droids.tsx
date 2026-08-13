@@ -1,13 +1,20 @@
-import { useState, useMemo } from "react";
-import { droids } from "../../data/droids";
+import { useState, useMemo, useEffect } from "react";
+import type { DroidEntry } from "../../data/droids";
 import { DroidCard } from "../components/database/DroidCard";
 
 export function Droids() {
+    const [droids, setDroids] = useState<DroidEntry[]>([]);
     const [query, setQuery] = useState("");
+
+    useEffect(() => {
+        fetch("/api/droids")
+        .then((r) => r.json())
+        .then(setDroids);
+    }, []);
 
     const filtered = useMemo(
         () => droids.filter((d) => d.name.toLowerCase().includes(query.toLowerCase())),
-        [query]
+        [query, droids]
     );
 
     return (

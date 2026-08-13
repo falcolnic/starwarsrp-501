@@ -36,10 +36,10 @@ export const soldiers = mysqlTable("soldiers", {
   nickname: varchar("nickname", { length: 128 }),
   rank: varchar("rank", { length: 128 }),
   rankSince: varchar("rank_since", { length: 32 }),
-  onlineTotalHours: int("online_total_hours").default(0),
-  onlineSessions: int("online_sessions").default(0),
-  unitLevel: int("unit_level").default(0),
-  recentSessions: json("recent_sessions").default([]), // [{date, duration}]
+  onlineTotalHours: int("online_total_hours").notNull().default(0),
+  onlineSessions: int("online_sessions").notNull().default(0),
+  unitLevel: int("unit_level").notNull().default(0),
+  recentSessions: json("recent_sessions").notNull().default([]),
   lastSyncedAt: timestamp("last_synced_at"),
 
   callsignOverride: varchar("callsign_override", { length: 128 }),
@@ -47,6 +47,7 @@ export const soldiers = mysqlTable("soldiers", {
   squads: json("squads").notNull().default([]),
   attached: json("attached").notNull().default([]),
   medals: json("medals").notNull().default([]),
+  manualCompleted: json("manual_completed").notNull().default([]),
   reprimands: int("reprimands").notNull().default(0),
   reprimandsFrozen: boolean("reprimands_frozen").notNull().default(false),
   status: varchar("status", { length: 64 }).notNull().default("active"),
@@ -115,4 +116,33 @@ export const blacklist = mysqlTable("blacklist", {
   workoff: varchar("workoff", { length: 128 }).notNull(),
   status: mysqlEnum("status", ["TRIALS", "EXILED", "BANNED"]).notNull().default("BANNED"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// ============ ZERGS ============
+export const zergs = mysqlTable("zergs", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+name: varchar("name", { length: 128 }).notNull(),
+  danger: mysqlEnum("danger", ["низкий", "средний", "высокий"]).notNull(),
+  hp: int("hp").notNull(),
+  attacks: json("attacks").notNull().default([]), // [{type, range, damage}]
+  recommendations: text("recommendations").notNull(),
+  description: text("description").notNull(),
+  image: varchar("image", { length: 512 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+});
+
+// ============ DROIDS ============
+export const droids = mysqlTable("droids", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  name: varchar("name", { length: 128 }).notNull(),
+  hp: int("hp").notNull(),
+  weapon: varchar("weapon", { length: 255 }).notNull(),
+  defenseLevel: varchar("defense_level", { length: 64 }).notNull(),
+  dangerLevel: varchar("danger_level", { length: 64 }).notNull(),
+  tactics: text("tactics").notNull(),
+  features: text("features").notNull(),
+  image: varchar("image", { length: 512 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
 });

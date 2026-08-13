@@ -2,56 +2,74 @@ import { useState, useEffect } from "react";
 import { ChevronDown, TrendingUp, CheckCircle2, Zap, User, BookOpen } from "lucide-react";
 import { Link } from "react-router";
 
-import { fetchBotData, calcDaysAtRank, type BotSoldierData } from "../../services/botData";
+import { calcDaysAtRank } from "../../services/botData";
 import { useRanks, useRankRequirements } from "../../hooks/useRanks";
 import { getNextRank, getRankIndex, evaluateRequirements, type RequirementStatus } from "../../services/promotionRules";
-import { DbRank } from "../../services/rankService";
 
-import rosterRaw from "../../data/roster.json";
-import { RosterManual } from "../components/FighterModal";
 import { InfoBlock } from "../components/promotion/InfoBlock";
 import { RankLadder } from "../components/promotion/RankLadder";
 import { RequirementRow } from "../components/promotion/RequirementRow";
 import { CloneHelmetEasterEgg } from "../components/ui/CloneHelmetEasterEgg";
 import { HUDSettings } from "../components/ui/HUDSettings";
 
-const rosterManual = rosterRaw as unknown as RosterManual[];
+interface Soldier {
+  cid: string;
+  steamId: string | null;
+  nickname: string | null;
+  rank: string | null;
+  rankSince: string | null;
+  onlineTotalHours: number;
+  onlineSessions: number;
+  unitLevel: number;
+  callsignOverride: string | null;
+  manualCompleted: string[];
+}
 
 export function Promotion() {
-  const [botMap, setBotMap] = useState<Map<string, BotSoldierData>>(new Map());
-  const [selectedCid, setSelectedCid] = useState<string>(rosterManual[0]?.cid ?? "");
+  const [soldiers, setSoldiers] = useState<Soldier[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCid, setSelectedCid] = useState<string>("");
   const [dropOpen, setDropOpen] = useState(false);
 
   const { ranks, loading: ranksLoading } = useRanks();
 
   useEffect(() => {
-    fetchBotData().then((data) => setBotMap(new Map(data.map((s) => [s.cid, s]))));
+    fetch("/api/soldiers", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data: Soldier[]) => {
+        setSoldiers(data);
+        if (data.length > 0) setSelectedCid(data[0].cid);
+        setLoading(false);
+      });
   }, []);
 
-  const manual = rosterManual.find((m) => m.cid === selectedCid);
-  const bot = botMap.get(selectedCid) ?? null;
-  const callsign = manual?.callsignOverride || bot?.nickname || `CT-${selectedCid}`;
-  const currentRankName = bot?.rank ?? "Рядовой-рекрут";
+  const soldier = soldiers.find((s) => s.cid === selectedCid);
+  const callsign = soldier?.callsignOverride || soldier?.nickname || `CT-${selectedCid}`;
+  const currentRankName = soldier?.rank ?? "Рядовой-рекрут";
 
   const nextRank = getNextRank(ranks, currentRankName);
   const currentIdx = getRankIndex(ranks, currentRankName);
-  const daysAtRank = bot?.rankSince ? calcDaysAtRank(bot.rankSince) : 0;
+  const daysAtRank = soldier?.rankSince ? calcDaysAtRank(soldier.rankSince) : 0;
 
-  // 3. Загружаем требования для следующего звания из БД
   const { requirements: dbRequirements, loading: reqsLoading } = useRankRequirements(nextRank?.id ?? null);
 
   const requirements: RequirementStatus[] = nextRank
     ? evaluateRequirements(
         dbRequirements,
-        { totalHours: bot?.online.totalHours ?? 0, sessions: bot?.online.sessions ?? 0, daysAtRank },
-        manual?.promotion.manualCompleted ?? []
+        {
+          totalHours: soldier?.onlineTotalHours ?? 0,
+          sessions: soldier?.onlineSessions ?? 0,
+          daysAtRank,
+          unitLevel: soldier?.unitLevel ?? 0,
+        },
+        soldier?.manualCompleted ?? []
       )
     : [];
 
   const completedCount = requirements.filter((r) => r.completed).length;
   const overallPct = requirements.length > 0 ? Math.round((completedCount / requirements.length) * 100) : 100;
 
-  if (ranksLoading) {
+  if (ranksLoading || loading) {
     return (
       <div className="min-h-screen text-white flex items-center justify-center font-mono">
         СИНХРОНИЗАЦИЯ С СЕТЬЮ ЛЕГИОНА...
@@ -62,7 +80,7 @@ export function Promotion() {
   return (
     <div className="relative w-full min-h-screen text-white py-10 px-6 bg-[#050910]">
       <CloneHelmetEasterEgg />
-      <div className="fixed inset-0 pointer-events-none bg-[url('/promotion-bg.png')] bg-cover bg-center bg-no-repeat z-0 opacity-40"/>
+      <div className="fixed inset-0 pointer-events-none bg-[url('/promotion-bg.png')] bg-cover bg-center bg-no-repeat z-0 opacity-40" />
       <HUDSettings />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 pb-20 text-white bg-[#080d17]/95 rounded-none border border-slate-800/60 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
@@ -107,25 +125,24 @@ export function Promotion() {
 
           {dropOpen && (
             <div className="absolute top-[105%] left-0 right-0 bg-[#0d1829] border border-[var(--border)] rounded shadow-[0_8px_32px_rgba(0,0,0,0.6)] max-h-72 overflow-y-auto z-1">
-              {rosterManual.map((m) => {
-                const b = botMap.get(m.cid);
-                const cs = m.callsignOverride || b?.nickname || `CT-${m.cid}`;
-                const isActive = m.cid === selectedCid;
+              {soldiers.map((s) => {
+                const cs = s.callsignOverride || s.nickname || `CT-${s.cid}`;
+                const isActive = s.cid === selectedCid;
                 return (
                   <button
-                    key={m.cid}
+                    key={s.cid}
                     onClick={() => {
-                      setSelectedCid(m.cid);
+                      setSelectedCid(s.cid);
                       setDropOpen(false);
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 text-left border-none border-b border-[var(--border)]/20 last:border-0 cursor-pointer text-white transition-colors duration-150 ${
                       isActive ? "bg-[var(--primary)]/15" : "bg-transparent hover:bg-[#121f35]"
                     }`}
                   >
-                    <span className="font-mono text-xs text-[var(--primary)]">CID-{m.cid}</span>
+                    <span className="font-mono text-xs text-[var(--primary)]">CID-{s.cid}</span>
                     <span className="font-display text-sm font-semibold truncate">{cs}</span>
                     <span className="font-mono text-[10px] text-[var(--muted-foreground)] ml-auto truncate">
-                      {b?.rank ?? "—"}
+                      {s.rank ?? "—"}
                     </span>
                   </button>
                 );
@@ -134,7 +151,7 @@ export function Promotion() {
           )}
         </div>
 
-        {manual && (
+        {soldier && (
           <div className="space-y-4">
             <div className="z-1 bg-[#0d1829] border border-[var(--border)] rounded-md p-5 shadow-md">
               <div className="font-mono text-sm tracking-widest text-[var(--muted-foreground)] mb-3 uppercase">
@@ -149,8 +166,8 @@ export function Promotion() {
               <InfoBlock label="Сле. Звание" value={nextRank?.name ?? "МАКСИМУМ"} />
               <InfoBlock label="Уровень" value={`${currentIdx < 0 ? "?" : currentIdx + 1} / ${ranks.length}`} mono />
               <InfoBlock label="Дней в звании" value={String(daysAtRank)} mono />
-              <InfoBlock label="Всего часов" value={`${bot?.online.totalHours ?? 0}ч`} mono />
-              <InfoBlock label="Сессий" value={String(bot?.online.sessions ?? 0)} mono />
+              <InfoBlock label="Всего часов" value={`${soldier.onlineTotalHours}ч`} mono />
+              <InfoBlock label="Сессий" value={String(soldier.onlineSessions)} mono />
             </div>
 
             {nextRank ? (
@@ -194,15 +211,7 @@ export function Promotion() {
                             })`,
                           }}
                         />
-                        <text
-                          x="24"
-                          y="28"
-                          textAnchor="middle"
-                          fontSize="14"
-                          fontFamily="monospace"
-                          fill="white"
-                          fontWeight="700"
-                        >
+                        <text x="24" y="28" textAnchor="middle" fontSize="14" fontFamily="monospace" fill="white" fontWeight="700">
                           {overallPct}%
                         </text>
                       </svg>

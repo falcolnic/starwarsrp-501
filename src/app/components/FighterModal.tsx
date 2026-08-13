@@ -355,7 +355,7 @@ export function FighterModal({ soldier, onClose }: FighterModalProps) {
           <div className="flex justify-between items-end mb-4">
             <Barcode value={soldier.cid} />
             <div className="font-mono text-xs tracking-[0.1em] text-[var(--muted-foreground)]/25 text-right">
-              <div>GAR-501-EAL</div>
+              <div>Э.Ш.Л-501</div>
               <div>REG: {soldier.cid}</div>
             </div>
           </div>
