@@ -35,3 +35,50 @@ export async function deleteRank(id: number) {
   await db.delete(ranks).where(eq(ranks.id, id));
   return before;
 }
+
+export async function getRequirementsByRank(rankId: number) {
+  return db.select().from(rankRequirements).where(eq(rankRequirements.rankId, rankId));
+}
+
+export async function createRequirement(data: {
+  rankId: number;
+  description: string;
+  type: "auto" | "manual";
+  metric?: string | null;
+  threshold?: number | null;
+}) {
+  const result = await db.insert(rankRequirements).values({
+    rankId: data.rankId,
+    description: data.description,
+    type: data.type,
+    metric: data.type === "auto" ? data.metric ?? null : null,
+    threshold: data.type === "auto" ? data.threshold ?? null : null,
+  });
+  const [created] = await db
+    .select()
+    .from(rankRequirements)
+    .where(eq(rankRequirements.id, result[0].insertId))
+    .limit(1);
+  return created;
+}
+
+export async function updateRequirement(
+  id: number,
+  data: Partial<{ description: string; type: "auto" | "manual"; metric: string | null; threshold: number | null }>
+) {
+  const [before] = await db.select().from(rankRequirements).where(eq(rankRequirements.id, id)).limit(1);
+  if (!before) return null;
+
+  await db.update(rankRequirements).set(data).where(eq(rankRequirements.id, id));
+  const [after] = await db.select().from(rankRequirements).where(eq(rankRequirements.id, id)).limit(1);
+
+  return { before, after };
+}
+
+export async function deleteRequirement(id: number) {
+  const [before] = await db.select().from(rankRequirements).where(eq(rankRequirements.id, id)).limit(1);
+  if (!before) return null;
+
+  await db.delete(rankRequirements).where(eq(rankRequirements.id, id));
+  return before;
+}

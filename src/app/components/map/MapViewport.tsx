@@ -1,11 +1,15 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
-import { CustomMarker, TACTICAL_MAPS, TOOL_CONFIGS, GRID_ROWS } from "./types";
+import { CustomMarker, BrushStroke, TACTICAL_MAPS, TOOL_CONFIGS, GRID_ROWS } from "./types";
 
 interface MapViewportProps {
     activeMapId: string;
     activeMarkers: CustomMarker[];
     setMarkers: React.Dispatch<React.SetStateAction<CustomMarker[]>>;
+    activeStrokes: BrushStroke[];
+    addStroke: (stroke: BrushStroke) => void;
+    brushColor: string;
+    brushWidth: number;
     activeTool: keyof typeof TOOL_CONFIGS;
     pinLabel: string;
     setPinLabel: (label: string) => void;
@@ -16,6 +20,10 @@ export function MapViewport({
     activeMapId,
     activeMarkers,
     setMarkers,
+    activeStrokes,
+    addStroke,
+    brushColor,
+    brushWidth,
     activeTool,
     pinLabel,
     setPinLabel,
@@ -25,6 +33,9 @@ export function MapViewport({
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
 
+    const [drawingPoints, setDrawingPoints] = useState<{ x: number; y: number }[]>([]);
+    const isBrushingRef = useRef(false);
+
     const containerRef = useRef<HTMLDivElement>(null);
     const dragStart = useRef({ x: 0, y: 0 });
     const mouseDownTime = useRef(0);
@@ -32,7 +43,6 @@ export function MapViewport({
 
     const activeMap = TACTICAL_MAPS.find((m) => m.id === activeMapId) || TACTICAL_MAPS[0];
 
-    // Restricts Zoom-out past 1.0 (100% full view)
     const handleWheel = useCallback((e: WheelEvent) => {
         e.preventDefault();
         setZoom((z) => Math.max(1, Math.min(4, z - e.deltaY * 0.001)));
@@ -45,20 +55,17 @@ export function MapViewport({
         return () => el.removeEventListener("wheel", handleWheel);
     }, [handleWheel]);
 
-    // Snaps and clamps pan offsets when zooming out or resizing window
     useEffect(() => {
         const clampPan = () => {
         const rect = containerRef.current?.getBoundingClientRect();
         if (!rect) return;
-        const S = rect.width; // Width and height are identical since container is a perfect square
+        const S = rect.width;
         const maxPan = Math.max(0, (S * (zoom - 1)) / 2);
-
         setPan((current) => ({
             x: Math.max(-maxPan, Math.min(maxPan, current.x)),
             y: Math.max(-maxPan, Math.min(maxPan, current.y)),
         }));
         };
-
         clampPan();
         window.addEventListener("resize", clampPan);
         return () => window.removeEventListener("resize", clampPan);
@@ -69,26 +76,61 @@ export function MapViewport({
         setPan({ x: 0, y: 0 });
     };
 
-    // Drag listeners
+    // Переводит координаты события мыши в проценты 0-100 относительно карты
+    function getPercentPoint(clientX: number, clientY: number) {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return null;
+        const x = ((clientX - rect.left) / rect.width) * 100;
+        const y = ((clientY - rect.top) / rect.height) * 100;
+        if (x < 0 || x > 100 || y < 0 || y > 100) return null;
+        return { x, y };
+    }
+
+    function finishStroke() {
+        if (drawingPoints.length > 1) {
+        addStroke({
+            id: crypto.randomUUID(),
+            mapId: activeMapId,
+            color: brushColor,
+            width: brushWidth,
+            points: drawingPoints,
+        });
+        }
+        setDrawingPoints([]);
+        isBrushingRef.current = false;
+    }
+
     const onMouseDown = (e: React.MouseEvent) => {
+        if (activeTool === "brush") {
+        const point = getPercentPoint(e.clientX, e.clientY);
+        if (!point) return;
+        isBrushingRef.current = true;
+        setDrawingPoints([point]);
+        return;
+        }
+
         mouseDownTime.current = Date.now();
         mouseDownPos.current = { x: e.clientX, y: e.clientY };
-
         setIsDragging(true);
         dragStart.current = { x: e.clientX - pan.x, y: e.clientY - pan.y };
     };
 
     const onMouseMove = (e: React.MouseEvent) => {
+        if (activeTool === "brush") {
+        if (!isBrushingRef.current) return;
+        const point = getPercentPoint(e.clientX, e.clientY);
+        if (!point) return;
+        setDrawingPoints((prev) => [...prev, point]);
+        return;
+        }
+
         if (isDragging) {
         const rect = containerRef.current?.getBoundingClientRect();
         if (!rect) return;
-
         const S = rect.width;
         const maxPan = Math.max(0, (S * (zoom - 1)) / 2);
-
         const newPanX = e.clientX - dragStart.current.x;
         const newPanY = e.clientY - dragStart.current.y;
-
         setPan({
             x: Math.max(-maxPan, Math.min(maxPan, newPanX)),
             y: Math.max(-maxPan, Math.min(maxPan, newPanY)),
@@ -97,14 +139,14 @@ export function MapViewport({
     };
 
     const onMouseUp = (e: React.MouseEvent) => {
+        if (activeTool === "brush") {
+        finishStroke();
+        return;
+        }
+
         setIsDragging(false);
-
         const clickDuration = Date.now() - mouseDownTime.current;
-        const dragDistance = Math.hypot(
-        e.clientX - mouseDownPos.current.x,
-        e.clientY - mouseDownPos.current.y
-        );
-
+        const dragDistance = Math.hypot(e.clientX - mouseDownPos.current.x, e.clientY - mouseDownPos.current.y);
         if (clickDuration < 250 && dragDistance < 6) {
         handleMapClick(e);
         }
@@ -116,29 +158,18 @@ export function MapViewport({
         return `${GRID_ROWS[rowIdx]}${colIdx + 1}`;
     };
 
-    // Mathematically perfect point positioning relative to the map canvas bounding box
     const handleMapClick = (e: React.MouseEvent) => {
-        if (activeTool === "pan") return;
+        if (activeTool === "pan" || activeTool === "brush") return;
 
-        const rect = containerRef.current?.getBoundingClientRect();
-        if (!rect) return;
+        const point = getPercentPoint(e.clientX, e.clientY);
+        if (!point) return;
 
-        // Browser bounding box coordinates already include scaling and panning shifts
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-
-        const pctX = (clickX / rect.width) * 100;
-        const pctY = (clickY / rect.height) * 100;
-
-        if (pctX < 0 || pctX > 100 || pctY < 0 || pctY > 100) return;
-
-        const sector = calculateGridSector(pctX, pctY);
-
+        const sector = calculateGridSector(point.x, point.y);
         const newMarker: CustomMarker = {
         id: crypto.randomUUID(),
         mapId: activeMapId,
-        x: pctX,
-        y: pctY,
+        x: point.x,
+        y: point.y,
         sector,
         type: activeTool as CustomMarker["type"],
         label: pinLabel.trim() || `${TOOL_CONFIGS[activeTool].label} - ${sector}`,
@@ -148,6 +179,10 @@ export function MapViewport({
         setPinLabel("");
     };
 
+    function pointsToPath(points: { x: number; y: number }[]) {
+        return points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+    }
+
     return (
         <div className="flex-1 relative border border-[var(--border)] rounded overflow-hidden select-none bg-[#0a0f1d] min-h-0 flex items-center justify-center p-4">
         <div
@@ -155,50 +190,98 @@ export function MapViewport({
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
-            onMouseLeave={() => setIsDragging(false)}
+            onMouseLeave={() => {
+            setIsDragging(false);
+            if (isBrushingRef.current) finishStroke();
+            }}
             onTouchStart={(e) => {
             const t = e.touches[0];
+            if (activeTool === "brush") {
+                const point = getPercentPoint(t.clientX, t.clientY);
+                if (!point) return;
+                isBrushingRef.current = true;
+                setDrawingPoints([point]);
+                return;
+            }
             setIsDragging(true);
             dragStart.current = { x: t.clientX - pan.x, y: t.clientY - pan.y };
             }}
             onTouchMove={(e) => {
+            const t = e.touches[0];
+            if (activeTool === "brush") {
+                if (!isBrushingRef.current) return;
+                const point = getPercentPoint(t.clientX, t.clientY);
+                if (!point) return;
+                setDrawingPoints((prev) => [...prev, point]);
+                return;
+            }
             if (isDragging) {
                 const rect = containerRef.current?.getBoundingClientRect();
                 if (!rect) return;
-
                 const S = rect.width;
                 const maxPan = Math.max(0, (S * (zoom - 1)) / 2);
-
-                const t = e.touches[0];
                 const newPanX = t.clientX - dragStart.current.x;
                 const newPanY = t.clientY - dragStart.current.y;
-
                 setPan({
                 x: Math.max(-maxPan, Math.min(maxPan, newPanX)),
                 y: Math.max(-maxPan, Math.min(maxPan, newPanY)),
                 });
             }
             }}
-            onTouchEnd={() => setIsDragging(false)}
-            // Aspect-square scaling bounds
+            onTouchEnd={() => {
+            if (activeTool === "brush") {
+                finishStroke();
+                return;
+            }
+            setIsDragging(false);
+            }}
             className="aspect-square relative select-none"
             style={{
             width: "min(700px, 100%, calc(100vh - 180px))",
             height: "min(700px, 100%, calc(100vh - 180px))",
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-            cursor: isDragging ? "grabbing" : activeTool === "pan" ? "grab" : "crosshair",
+            cursor: isDragging ? "grabbing" : activeTool === "brush" ? "crosshair" : activeTool === "pan" ? "grab" : "crosshair",
             }}
         >
-            {/* Base map */}
             <img
             src={activeMap.imageSrc}
             alt={activeMap.name}
             className="w-full h-full object-fill opacity-85 select-none pointer-events-none"
-            style={{ imageRendering: "pixelated" }} 
+            style={{ imageRendering: "pixelated" }}
             draggable={false}
             />
 
-            {/* Tactical interactive pins */}
+            {/* Слой линий — векторный, масштабируется вместе с картой автоматически */}
+            <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            >
+            {activeStrokes.map((stroke) => (
+                <path
+                key={stroke.id}
+                d={pointsToPath(stroke.points)}
+                fill="none"
+                stroke={stroke.color}
+                strokeWidth={stroke.width}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={0.9}
+                />
+            ))}
+            {drawingPoints.length > 1 && (
+                <path
+                d={pointsToPath(drawingPoints)}
+                fill="none"
+                stroke={brushColor}
+                strokeWidth={brushWidth}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={0.7}
+                />
+            )}
+            </svg>
+
             {activeMarkers.map((marker) => {
             const config = TOOL_CONFIGS[marker.type];
             return (
@@ -218,38 +301,26 @@ export function MapViewport({
                     }
                     }}
                 >
-                    {config.markerLabel}
+                    {(config as any).markerLabel}
                 </div>
                 </div>
             );
             })}
         </div>
 
-        {/* Floating Zoom overlay controllers */}
         <div className="absolute top-3 right-3 flex flex-col gap-1 z-20">
-            <button
-            onClick={() => setZoom((z) => Math.min(4, z + 0.25))}
-            className="w-8 h-8 bg-[#0d1829]/95 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white rounded flex items-center justify-center cursor-pointer transition-colors duration-150"
-            >
+            <button onClick={() => setZoom((z) => Math.min(4, z + 0.25))} className="w-8 h-8 bg-[#0d1829]/95 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white rounded flex items-center justify-center cursor-pointer transition-colors duration-150">
             <ZoomIn size={16} />
             </button>
-            <button
-            onClick={() => setZoom((z) => Math.max(1, z - 0.25))}
-            disabled={zoom <= 1}
-            className="w-8 h-8 bg-[#0d1829]/95 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white rounded flex items-center justify-center cursor-pointer transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
+            <button onClick={() => setZoom((z) => Math.max(1, z - 0.25))} disabled={zoom <= 1} className="w-8 h-8 bg-[#0d1829]/95 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white rounded flex items-center justify-center cursor-pointer transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
             <ZoomOut size={16} />
             </button>
-            <button
-            onClick={resetView}
-            className="w-8 h-8 bg-[#0d1829]/95 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white rounded flex items-center justify-center cursor-pointer transition-colors duration-150"
-            >
+            <button onClick={resetView} className="w-8 h-8 bg-[#0d1829]/95 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white rounded flex items-center justify-center cursor-pointer transition-colors duration-150">
             <RotateCcw size={16} />
             </button>
         </div>
 
-        {/* Details HUD panel */}
-        <div className="absolute bottom-3 left-3 bg-[#0d1829]/80 border border-[var(--border)] px-3 py-1.5 rounded font-mono text-[0.62rem] text-[var(--muted-foreground)] uppercase tracking-wider select-none pointer-events-none">
+        <div className="absolute bottom-3 left-3 bg-[#0d1829]/80 border border-[var(--border)] px-3 py-2 rounded font-mono text-xs text-[var(--muted-foreground)] uppercase tracking-wider select-none pointer-events-none">
             GRID: {activeMap.name} · ZOOM: {Math.round(zoom * 100)}%
         </div>
         </div>

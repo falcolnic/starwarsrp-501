@@ -67,17 +67,17 @@ export function RankLadder({ ranks, currentRankName, nextRank }: RankLadderProps
             </div>
         </div>
 
-        <div className="flex justify-between items-center border-b border-[var(--border)]/20 pb-2">
+        <div className="flex justify-between items-center border-b border-[var(--border)]/20">
             <span className="font-display text-sm text-[var(--primary)] tracking-widest uppercase">
             Ближайшее окружение
             </span>
             <button
             onClick={() => setShowFullLadder(!showFullLadder)}
-            className="flex items-center gap-1.5 px-3 py-1 bg-[#0c1424] hover:bg-[#121f35] border border-[var(--border)] hover:border-[var(--primary)] text-[11px] font-mono tracking-wider uppercase rounded transition-colors duration-150 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1 bg-[#0c1424] hover:bg-[#121f35] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-mono tracking-wider uppercase rounded transition-colors duration-150 cursor-pointer"
             >
-            <Award size={13} className="text-[var(--primary)]" />
+            <Award size={18} className="text-[var(--primary)]" />
             <span>{showFullLadder ? "СВЕРНУТЬ ЛИСТ" : "ПОКАЗАТЬ ВСЕ ЗВАНИЯ"}</span>
-            {showFullLadder ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            {showFullLadder ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </button>
         </div>
 
@@ -130,7 +130,7 @@ export function RankLadder({ ranks, currentRankName, nextRank }: RankLadderProps
                     </div>
 
                     <div
-                        className={`absolute top-8 left-1/2 -translate-x-1/2 font-mono text-[9px] sm:text-xs tracking-wide text-center leading-tight w-[130px] select-none line-clamp-2 z-20 ${
+                        className={`absolute top-8 left-1/2 -translate-x-1/2 font-mono text-[9px] sm:text-sm tracking-wide text-center leading-tight w-[130px] select-none line-clamp-2 z-20 ${
                         isCurrent ? "text-[#F5C518] font-bold scale-105" : "text-slate-400"
                         }`}
                     >
@@ -161,7 +161,7 @@ export function RankLadder({ ranks, currentRankName, nextRank }: RankLadderProps
                         : "bg-[#080d17]/40 border-[var(--border)]/40"
                     }`}
                 >
-                    <span className="font-mono text-[10px] text-[var(--muted-foreground)] shrink-0 min-w-[18px]">
+                    <span className="font-mono text-xs text-[var(--muted-foreground)] shrink-0 min-w-[18px]">
                     {String(i + 1).padStart(2, "0")}
                     </span>
 
@@ -176,7 +176,7 @@ export function RankLadder({ ranks, currentRankName, nextRank }: RankLadderProps
                     />
 
                     <span
-                    className={`font-mono text-[11px] truncate ${
+                    className={`font-mono text-xs truncate ${
                         isCurrent ? "text-[#F5C518] font-bold" : isPast ? "text-white/80" : "text-white/40"
                     }`}
                     >
