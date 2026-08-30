@@ -13,6 +13,7 @@ export async function getSoldierByCid(cid: string) {
 
 export async function createSoldier(data: {
     cid: string;
+    rank?: string | null;
     steamId?: string | null;
     callsignOverride?: string | null;
     positions?: string[];
@@ -30,6 +31,7 @@ export async function createSoldier(data: {
 
     await db.insert(soldiers).values({
         cid: data.cid,
+        rank: data.rank ?? null,
         steamId: data.steamId ?? null,
         callsignOverride: data.callsignOverride ?? null,
         positions: data.positions ?? [],
@@ -51,6 +53,7 @@ export async function createSoldier(data: {
 export async function updateSoldier(
     cid: string,
     data: Partial<{
+        rank: string | null;
         steamId: string | null;
         callsignOverride: string | null;
         positions: string[];

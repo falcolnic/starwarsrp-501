@@ -14,7 +14,7 @@ function OathTabContent() {
                     value={npz}
                     onChange={(e) => setNpz(e.target.value)}
                     placeholder="Введите НПЗ"
-                    className="mx-1.5 px-3 py-0.5 bg-[#080d17] border-b-2 border-[var(--primary)] focus:border-[#2ECC71] text-[var(--chart-3)] placeholder:text-slate-600 font-bold focus:outline-none transition-colors rounded-none w-44 text-center inline-block not-italic"
+                    className="mx-1.5 px-4 py-0.5 bg-[#080d17] border-b-2 border-[var(--primary)] focus:border-[#2ECC71] text-[var(--chart-3)] placeholder:text-slate-600 font-bold focus:outline-none transition-colors rounded-none w-70 text-center inline-block not-italic"
                 />
                 , принимаю присягу 501 Элитного Штурмового легиона и торжественно клянусь: быть честным, храбрым, дисциплинированным, бдительным бойцом, беспрекословно выполнять воинские уставы, приказы командиров и начальников. Я клянусь добросовестно изучать военное дело, и до последнего вздоха защищать Республику. Я всегда готов встать на защиту Республики и Канцлера, я клянусь защищать мужественно, умело, с достоинством и честью, не щадя своей крови и самой жизни для достижения полной победы над врагами. Если я нарушу мою торжественную клятву то меня ждёт суровая кара Республики , а так-же всеобщая ненависть и презрение.»
             </div>

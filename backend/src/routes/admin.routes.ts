@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { requireRole } from "../middleware/requireRole.js";
 import { logAudit } from "../services/audit.service.js";
@@ -9,24 +9,38 @@ import {
   createRequirement,
   updateRequirement,
   deleteRequirement,
+  getRequirementsByRank,
+  getAllRanks,
 } from "../services/rank.service.js";
 import {
   createBlacklistEntry,
   updateBlacklistEntry,
   deleteBlacklistEntry,
 } from "../services/blacklist.service.js";
-
 import { createDocument, updateDocument, deleteDocument } from "../services/document.service.js";
 import { getAllUsers, updateUserRole } from "../services/user.service.js";
-import { createSoldier, deleteSoldier, getAllSoldiers, updateSoldier, updateSoldierMedals } from "../services/soldiers.service.js";
+import {
+  createSoldier,
+  deleteSoldier,
+  getAllSoldiers,
+  updateSoldier,
+  updateSoldierMedals,
+} from "../services/soldiers.service.js";
 import { createDroid, deleteDroid, updateDroid } from "../services/droid.service.js";
 import { createZerg, deleteZerg, updateZerg } from "../services/zerg.service.js";
 
 const router = Router();
 
-// ============ SOLDIERS ============
+// Express async handler wrapper
+const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+
+// ============ SCHEMAS ============
 const soldierCreateSchema = z.object({
   cid: z.string().min(1).max(16),
+  rank: z.string().nullable().optional(),
   steamId: z.string().nullable().optional(),
   callsignOverride: z.string().nullable().optional(),
   positions: z.array(z.string()).optional(),
@@ -40,12 +54,82 @@ const soldierCreateSchema = z.object({
   commandOrder: z.number().int().nullable().optional(),
 });
 
-router.get("/soldiers", requireRole("admin"), async (_req, res) => {
-  const list = await getAllSoldiers();
-  res.json(list);
+const soldierUpdateSchema = soldierCreateSchema.omit({ cid: true }).partial().extend({
+  reprimands: z.number().int().optional(),
+  reprimandsFrozen: z.boolean().optional(),
+  leaveUntil: z.string().nullable().optional(),
+  reserveUntil: z.string().nullable().optional(),
+  avatar: z.string().nullable().optional(),
 });
 
-router.post("/soldiers", requireRole("admin"), async (req, res) => {
+const medalsSchema = z.object({
+  medals: z.array(z.string()),
+});
+
+const rankSchema = z.object({
+  name: z.string().min(1),
+  order: z.number().int(),
+  description: z.string().optional(),
+});
+
+const requirementSchema = z.object({
+  description: z.string().min(1),
+  type: z.enum(["auto", "manual"]),
+  metric: z.string().nullable().optional(),
+  threshold: z.number().int().nullable().optional(),
+});
+
+const docSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  url: z.string().url(),
+  category: z.string().optional(),
+});
+
+const roleSchema = z.object({
+  role: z.enum(["user", "admin", "superadmin"]),
+});
+
+const zergSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  danger: z.enum(["низкий", "средний", "высокий"]),
+  hp: z.number().int().positive(),
+  attacks: z.array(z.object({ type: z.string(), range: z.string(), damage: z.string() })),
+  recommendations: z.string().min(1),
+  description: z.string().min(1),
+  image: z.string().nullable().optional(),
+});
+
+const droidSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  hp: z.number().int().positive(),
+  weapon: z.string().min(1),
+  defenseLevel: z.string().min(1),
+  dangerLevel: z.string().min(1),
+  tactics: z.string().min(1),
+  features: z.string().min(1),
+  image: z.string().nullable().optional(),
+});
+
+const blacklistSchema = z.object({
+  number: z.string().min(1),
+  callsign: z.string().min(1),
+  steamId: z.string().min(1),
+  reason: z.string().min(1),
+  addedDate: z.string().min(1),
+  workoff: z.string().min(1),
+  status: z.enum(["TRIALS", "EXILED", "BANNED"]).optional(),
+});
+
+// ============ SOLDIERS ============
+router.get("/soldiers", requireRole("admin"), asyncHandler(async (_req, res) => {
+  const list = await getAllSoldiers();
+  res.json(list);
+}));
+
+router.post("/soldiers", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = soldierCreateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -65,17 +149,9 @@ router.post("/soldiers", requireRole("admin"), async (req, res) => {
     }
     throw err;
   }
-});
+}));
 
-const soldierUpdateSchema = soldierCreateSchema.omit({ cid: true }).partial().extend({
-  reprimands: z.number().int().optional(),
-  reprimandsFrozen: z.boolean().optional(),
-  leaveUntil: z.string().nullable().optional(),
-  reserveUntil: z.string().nullable().optional(),
-  avatar: z.string().nullable().optional(),
-});
-
-router.patch("/soldiers/:cid", requireRole("admin"), async (req, res) => {
+router.patch("/soldiers/:cid", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = soldierUpdateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -92,9 +168,9 @@ router.patch("/soldiers/:cid", requireRole("admin"), async (req, res) => {
   });
 
   res.json(result.after);
-});
+}));
 
-router.delete("/soldiers/:cid", requireRole("admin"), async (req, res) => {
+router.delete("/soldiers/:cid", requireRole("admin"), asyncHandler(async (req, res) => {
   const deleted = await deleteSoldier(req.params.cid);
   if (!deleted) return res.status(404).json({ error: "Боец не найден" });
 
@@ -107,13 +183,9 @@ router.delete("/soldiers/:cid", requireRole("admin"), async (req, res) => {
   });
 
   res.json({ ok: true });
-});
+}));
 
-const medalsSchema = z.object({
-  medals: z.array(z.string()),
-});
-
-router.patch("/soldiers/:cid/medals", requireRole("admin"), async (req, res) => {
+router.patch("/soldiers/:cid/medals", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = medalsSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -130,16 +202,15 @@ router.patch("/soldiers/:cid/medals", requireRole("admin"), async (req, res) => 
   });
 
   res.json(result.after);
-});
+}));
 
-// ============ RANKS (admin+) ============
-const rankSchema = z.object({
-  name: z.string().min(1),
-  order: z.number().int(),
-  description: z.string().optional(),
-});
+// ============ RANKS & REQUIREMENTS ============
+router.get("/ranks", requireRole("admin"), asyncHandler(async (_req, res) => {
+  const list = await getAllRanks(); // Or whatever function your rank service uses to fetch all ranks
+  res.json(list);
+}));
 
-router.post("/ranks", requireRole("admin"), async (req, res) => {
+router.post("/ranks", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = rankSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -153,9 +224,9 @@ router.post("/ranks", requireRole("admin"), async (req, res) => {
   });
 
   res.status(201).json(created);
-});
+}));
 
-router.patch("/ranks/:id", requireRole("admin"), async (req, res) => {
+router.patch("/ranks/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const parsed = rankSchema.partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
@@ -173,9 +244,9 @@ router.patch("/ranks/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json(result.after);
-});
+}));
 
-router.delete("/ranks/:id", requireRole("admin"), async (req, res) => {
+router.delete("/ranks/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const deleted = await deleteRank(id);
   if (!deleted) return res.status(404).json({ error: "Звание не найдено" });
@@ -189,16 +260,15 @@ router.delete("/ranks/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json({ ok: true });
-});
+}));
 
-const requirementSchema = z.object({
-  description: z.string().min(1),
-  type: z.enum(["auto", "manual"]),
-  metric: z.string().nullable().optional(),
-  threshold: z.number().int().nullable().optional(),
-});
+router.get("/ranks/:rankId/requirements", requireRole("admin"), asyncHandler(async (req, res) => {
+  const rankId = Number(req.params.rankId);
+  const list = await getRequirementsByRank(rankId);
+  res.json(list);
+}));
 
-router.post("/ranks/:rankId/requirements", requireRole("admin"), async (req, res) => {
+router.post("/ranks/:rankId/requirements", requireRole("admin"), asyncHandler(async (req, res) => {
   const rankId = Number(req.params.rankId);
   const parsed = requirementSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
@@ -213,9 +283,9 @@ router.post("/ranks/:rankId/requirements", requireRole("admin"), async (req, res
   });
 
   res.status(201).json(created);
-});
+}));
 
-router.patch("/requirements/:id", requireRole("admin"), async (req, res) => {
+router.patch("/requirements/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const parsed = requirementSchema.partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
@@ -233,9 +303,9 @@ router.patch("/requirements/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json(result.after);
-});
+}));
 
-router.delete("/requirements/:id", requireRole("admin"), async (req, res) => {
+router.delete("/requirements/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const deleted = await deleteRequirement(id);
   if (!deleted) return res.status(404).json({ error: "Требование не найдено" });
@@ -249,19 +319,10 @@ router.delete("/requirements/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json({ ok: true });
-});
+}));
 
-const blacklistSchema = z.object({
-  number: z.string().min(1),
-  callsign: z.string().min(1),
-  steamId: z.string().min(1),
-  reason: z.string().min(1),
-  addedDate: z.string().min(1),
-  workoff: z.string().min(1),
-  status: z.enum(["TRIALS", "EXILED", "BANNED"]).optional(),
-});
-
-router.post("/blacklist", requireRole("admin"), async (req, res) => {
+// ============ BLACKLIST ============
+router.post("/blacklist", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = blacklistSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -275,9 +336,9 @@ router.post("/blacklist", requireRole("admin"), async (req, res) => {
   });
 
   res.status(201).json(created);
-});
+}));
 
-router.patch("/blacklist/:id", requireRole("admin"), async (req, res) => {
+router.patch("/blacklist/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const parsed = blacklistSchema.partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
@@ -295,9 +356,9 @@ router.patch("/blacklist/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json(result.after);
-});
+}));
 
-router.delete("/blacklist/:id", requireRole("admin"), async (req, res) => {
+router.delete("/blacklist/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const deleted = await deleteBlacklistEntry(id);
   if (!deleted) return res.status(404).json({ error: "Запись не найдена" });
@@ -311,17 +372,10 @@ router.delete("/blacklist/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json({ ok: true });
-});
+}));
 
-// ============ DOCUMENTS (admin+) ============
-const docSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().optional(),
-  url: z.string().url(),
-  category: z.string().optional(),
-});
-
-router.post("/docs", requireRole("admin"), async (req, res) => {
+// ============ DOCUMENTS ============
+router.post("/docs", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = docSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -335,9 +389,9 @@ router.post("/docs", requireRole("admin"), async (req, res) => {
   });
 
   res.status(201).json(created);
-});
+}));
 
-router.patch("/docs/:id", requireRole("admin"), async (req, res) => {
+router.patch("/docs/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const parsed = docSchema.partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
@@ -355,9 +409,9 @@ router.patch("/docs/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json(result.after);
-});
+}));
 
-router.delete("/docs/:id", requireRole("admin"), async (req, res) => {
+router.delete("/docs/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const deleted = await deleteDocument(id);
   if (!deleted) return res.status(404).json({ error: "Документ не найден" });
@@ -371,19 +425,15 @@ router.delete("/docs/:id", requireRole("admin"), async (req, res) => {
   });
 
   res.json({ ok: true });
-});
+}));
 
-// ============ USERS (superadmin only) ============
-router.get("/users", requireRole("superadmin"), async (_req, res) => {
+// ============ USERS ============
+router.get("/users", requireRole("superadmin"), asyncHandler(async (_req, res) => {
   const list = await getAllUsers();
   res.json(list);
-});
+}));
 
-const roleSchema = z.object({
-  role: z.enum(["user", "admin", "superadmin"]),
-});
-
-router.patch("/users/:id/role", requireRole("superadmin"), async (req, res) => {
+router.patch("/users/:id/role", requireRole("superadmin"), asyncHandler(async (req, res) => {
   const id = Number(req.params.id);
   const parsed = roleSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
@@ -401,20 +451,10 @@ router.patch("/users/:id/role", requireRole("superadmin"), async (req, res) => {
   });
 
   res.json(result.after);
-});
+}));
 
-const zergSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  danger: z.enum(["низкий", "средний", "высокий"]),
-  hp: z.number().int().positive(),
-  attacks: z.array(z.object({ type: z.string(), range: z.string(), damage: z.string() })),
-  recommendations: z.string().min(1),
-  description: z.string().min(1),
-  image: z.string().nullable().optional(),
-});
-
-router.post("/zergs", requireRole("admin"), async (req, res) => {
+// ============ ZERGS ============
+router.post("/zergs", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = zergSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -428,9 +468,9 @@ router.post("/zergs", requireRole("admin"), async (req, res) => {
     }
     throw err;
   }
-});
+}));
 
-router.patch("/zergs/:id", requireRole("admin"), async (req, res) => {
+router.patch("/zergs/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = zergSchema.omit({ id: true }).partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -439,29 +479,18 @@ router.patch("/zergs/:id", requireRole("admin"), async (req, res) => {
 
   await logAudit({ userId: req.currentUser!.id, action: "update", entityType: "zerg", entityId: req.params.id, before: result.before, after: result.after });
   res.json(result.after);
-});
+}));
 
-router.delete("/zergs/:id", requireRole("admin"), async (req, res) => {
+router.delete("/zergs/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const deleted = await deleteZerg(req.params.id);
   if (!deleted) return res.status(404).json({ error: "Запись не найдена" });
 
   await logAudit({ userId: req.currentUser!.id, action: "delete", entityType: "zerg", entityId: req.params.id, before: deleted });
   res.json({ ok: true });
-});
+}));
 
-const droidSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  hp: z.number().int().positive(),
-  weapon: z.string().min(1),
-  defenseLevel: z.string().min(1),
-  dangerLevel: z.string().min(1),
-  tactics: z.string().min(1),
-  features: z.string().min(1),
-  image: z.string().nullable().optional(),
-});
-
-router.post("/droids", requireRole("admin"), async (req, res) => {
+// ============ DROIDS ============
+router.post("/droids", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = droidSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -475,9 +504,9 @@ router.post("/droids", requireRole("admin"), async (req, res) => {
     }
     throw err;
   }
-});
+}));
 
-router.patch("/droids/:id", requireRole("admin"), async (req, res) => {
+router.patch("/droids/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const parsed = droidSchema.omit({ id: true }).partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
@@ -486,134 +515,14 @@ router.patch("/droids/:id", requireRole("admin"), async (req, res) => {
 
   await logAudit({ userId: req.currentUser!.id, action: "update", entityType: "droid", entityId: req.params.id, before: result.before, after: result.after });
   res.json(result.after);
-});
+}));
 
-router.delete("/droids/:id", requireRole("admin"), async (req, res) => {
+router.delete("/droids/:id", requireRole("admin"), asyncHandler(async (req, res) => {
   const deleted = await deleteDroid(req.params.id);
   if (!deleted) return res.status(404).json({ error: "Запись не найдена" });
 
   await logAudit({ userId: req.currentUser!.id, action: "delete", entityType: "droid", entityId: req.params.id, before: deleted });
   res.json({ ok: true });
-});
-
-const blacklistSchema = z.object({
-  number: z.string().min(1),
-  callsign: z.string().min(1),
-  steamId: z.string().min(1),
-  reason: z.string().min(1),
-  addedDate: z.string().min(1),
-  workoff: z.string().min(1),
-  status: z.enum(["TRIALS", "EXILED", "BANNED"]).optional(),
-});
-
-router.post("/blacklist", requireRole("admin"), async (req, res) => {
-  const parsed = blacklistSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
-
-  const created = await createBlacklistEntry({ ...parsed.data, addedBy: req.currentUser!.id });
-
-  res.status(201).json(created);
-});
-
-router.patch("/blacklist/:id", requireRole("admin"), async (req, res) => {
-  const id = Number(req.params.id);
-  const parsed = blacklistSchema.partial().safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
-
-  const result = await updateBlacklistEntry(id, parsed.data);
-  if (!result) return res.status(404).json({ error: "Запись не найдена" });
-
-  await logAudit({
-    userId: req.currentUser!.id,
-    action: "update",
-    entityType: "blacklist",
-    entityId: id,
-    before: result.before,
-    after: result.after,
-  });
-
-  res.json(result.after);
-});
-
-router.delete("/blacklist/:id", requireRole("admin"), async (req, res) => {
-  const id = Number(req.params.id);
-  const deleted = await deleteBlacklistEntry(id);
-  if (!deleted) return res.status(404).json({ error: "Запись не найдена" });
-
-  await logAudit({
-    userId: req.currentUser!.id,
-    action: "delete",
-    entityType: "blacklist",
-    entityId: id,
-    before: deleted,
-  });
-
-  res.json({ ok: true });
-});
-const requirementCreateSchema = z.object({
-  description: z.string().min(1),
-  type: z.enum(["auto", "manual"]),
-  metric: z.string().nullable().optional(),
-  threshold: z.number().int().nullable().optional(),
-});
-
-router.get("/ranks/:rankId/requirements", requireRole("admin"), async (req, res) => {
-  const rankId = Number(req.params.rankId);
-  const list = await getRequirementsByRank(rankId);
-  res.json(list);
-});
-
-router.post("/ranks/:rankId/requirements", requireRole("admin"), async (req, res) => {
-  const rankId = Number(req.params.rankId);
-  const parsed = requirementCreateSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
-
-  const created = await createRequirement({ rankId, ...parsed.data });
-  await logAudit({
-    userId: req.currentUser!.id,
-    action: "create",
-    entityType: "rank_requirement",
-    entityId: created.id,
-    after: created,
-  });
-
-  res.status(201).json(created);
-});
-
-router.patch("/requirements/:id", requireRole("admin"), async (req, res) => {
-  const id = Number(req.params.id);
-  const parsed = requirementCreateSchema.partial().safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
-
-  const result = await updateRequirement(id, parsed.data);
-  if (!result) return res.status(404).json({ error: "Требование не найдено" });
-
-  await logAudit({
-    userId: req.currentUser!.id,
-    action: "update",
-    entityType: "rank_requirement",
-    entityId: id,
-    before: result.before,
-    after: result.after,
-  });
-
-  res.json(result.after);
-});
-
-router.delete("/requirements/:id", requireRole("admin"), async (req, res) => {
-  const id = Number(req.params.id);
-  const deleted = await deleteRequirement(id);
-  if (!deleted) return res.status(404).json({ error: "Требование не найдено" });
-
-  await logAudit({
-    userId: req.currentUser!.id,
-    action: "delete",
-    entityType: "rank_requirement",
-    entityId: id,
-    before: deleted,
-  });
-
-  res.json({ ok: true });
-});
+}));
 
 export default router;

@@ -179,7 +179,7 @@ export function FighterModal({ soldier, onClose }: FighterModalProps) {
   const sc = STATUS_CONFIG[soldier.status] ?? STATUS_CONFIG.active;
   const daysAtRank = calcDaysAtRank(soldier.rankSince);
   const displayName = soldier.nickname ?? `CT-${soldier.cid}`;
-  const npzValue = `${soldier.cid} | ${displayName} | ${soldier.rank ?? "—"}`;
+  const npzValue = `${soldier.cid} | ${soldier.callsignOverride ?? displayName} | ${soldier.rank ?? "—"}`;
   const steamId = soldier.steamId ?? "";
   const discordId = soldier.discordId ?? "";
   const closeButtonRef = useRef<HTMLButtonElement>(null);

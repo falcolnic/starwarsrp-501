@@ -23,7 +23,7 @@ const COLUMNS: Array<{ key?: SortKey; label: string }> = [
 export function Roster() {
   const { soldiers, loading } = useSoldiers();
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("cid");
+  const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [selected, setSelected] = useState<Soldier | null>(null);
 
@@ -47,7 +47,40 @@ export function Roster() {
 
   const sorted = useMemo(() => {
     if (!sortDir) return filtered;
+
+    const rankWeights: Record<string, number> = {
+      "Клон Маршал": 30,
+      "Клон Коммандер": 29,
+      "Командир первого класса": 28,
+      "Командир": 27,
+      "Подполковник": 26,
+      "Майор": 25,
+      "Капитан": 24,
+      "Лейтенант": 23,
+      "Команд сержант-майор": 22,
+      "Сержант-майор": 21,
+      "Сержант первого класса": 20,
+      "Штаб-сержант": 19,
+      "Сержант": 18,
+      "Капрал": 17,
+      "Специалист": 16,
+      "Старший рядовой": 15,
+      "Рядовой": 14,
+      "Рядовой-рекрут": 13,
+      "ИПК": 12,
+      "Медик": 11,
+      "Кадет.корпус": 10,
+      "212 Э.Д.Ш.Б": 9,
+      "Гвардия": 8,
+    };
+
     return [...filtered].sort((a, b) => {
+      if (sortKey === "rank") {
+        const weightA = rankWeights[a.rank ?? ""] ?? 0;
+        const weightB = rankWeights[b.rank ?? ""] ?? 0;
+        return sortDir === "asc" ? weightB - weightA : weightA - weightB; // Highest rank first by default
+      }
+
       let va = "";
       let vb = "";
       if (sortKey === "cid") {
@@ -56,9 +89,6 @@ export function Roster() {
       } else if (sortKey === "callsign") {
         va = (a.callsignOverride || a.nickname || a.cid).toLowerCase();
         vb = (b.callsignOverride || b.nickname || b.cid).toLowerCase();
-      } else if (sortKey === "rank") {
-        va = a.rank ?? "";
-        vb = b.rank ?? "";
       } else if (sortKey === "status") {
         va = a.status ?? "";
         vb = b.status ?? "";
@@ -70,8 +100,12 @@ export function Roster() {
   return (
     <div className="relative flex-1 flex flex-col">
       <div
-        className="absolute inset-0 z-1 bg-cover bg-center opacity-[0.7] pointer-events-none"
-        style={{ backgroundImage: "url('/topography.png')" }}
+        className="absolute inset-0 z-1 pointer-events-none opacity-[0.7]"
+        style={{
+          backgroundImage: "url('/topography.png')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "auto",
+        }}
       />
       <div className="min-w-6xl mx-auto py-10 pb-10 z-2">
         <div className="anim-fade-up mb-7">
