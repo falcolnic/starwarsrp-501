@@ -111,7 +111,7 @@ export const blacklist = mysqlTable("blacklist", {
   callsign: varchar("callsign", { length: 128 }).notNull(),
   steamId: varchar("steam_id", { length: 64 }).notNull(),
   reason: text("reason").notNull(),
-  addedBy: int("added_by").notNull(),
+  addedBy: varchar("added_by", { length: 128 }),
   addedDate: varchar("added_date", { length: 32 }).notNull(),
   workoff: varchar("workoff", { length: 128 }).notNull(),
   status: mysqlEnum("status", ["TRIALS", "EXILED", "BANNED"]).notNull().default("BANNED"),

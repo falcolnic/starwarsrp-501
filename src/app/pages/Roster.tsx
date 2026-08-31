@@ -100,7 +100,7 @@ export function Roster() {
   return (
     <div className="relative flex-1 flex flex-col">
       <div
-        className="absolute inset-0 z-1 pointer-events-none opacity-[0.7]"
+        className="absolute inset-0 z-1 pointer-events-none"
         style={{
           backgroundImage: "url('/topography.png')",
           backgroundRepeat: "repeat",

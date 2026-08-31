@@ -1,40 +1,28 @@
+## Running the code
 
-  # User dashboard
+Run `npm i` to install the dependencies.
 
-  This is a code bundle for User dashboard. The original project is available at https://www.figma.com/design/wyV7JdFgMxMwYaFovC3Wrd/User-dashboard.
+Run `npm run dev` to start the development server.
 
-  ## Project Structure
+## Deploy to Vercel
 
-  ```text
-  .
-  |-- default_shadcn_theme.css
-  |-- index.html
-  |-- package.json
-  |-- postcss.config.mjs
-  |-- README.md
-  |-- vite.config.ts
-  `-- src/
-    |-- main.tsx
-    |-- app/
-    |   |-- App.tsx
-    |   |-- routes.tsx
-    |   |-- components/
-    |   |   `-- ui/
-    |   `-- pages/
-    |-- data/
-    |-- services/
-    `-- styles/
-      |-- animations.css
-      |-- fonts.css
-      |-- globals.css
-      |-- index.css
-      |-- tailwind.css
-      `-- theme.css
-  ```
+1. Create a **separate** Vercel project pointing at the `backend/` folder.
+2. Add env vars: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `SESSION_SECRET`, `FRONTEND_ORIGIN`.
+3. Deploy — `vercel.json` routes all `/api/*` requests to `api/index.ts`.
+4. Verify: `https://your-backend.vercel.app/api/health`.
 
-  ## Running the code
+## Connect the Frontend
 
-  Run `npm i` to install the dependencies.
+Replace direct imports from `data/*.ts` with fetch calls:
 
-  Run `npm run dev` to start the development server.
-  
+```ts
+const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ranks`, {
+  credentials: "include", // required for session cookies
+});
+const ranks = await res.json();
+```
+
+Frontend `.env` (Vite):
+```
+VITE_API_URL=https://your-backend.vercel.app
+```

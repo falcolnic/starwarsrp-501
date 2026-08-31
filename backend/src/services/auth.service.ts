@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { users, sessions } from "../db/schema.js";
 
-const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7; // 7 днів
+const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7;
 
 export async function verifyCredentials(username: string, password: string) {
   const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
@@ -32,7 +32,6 @@ export async function getSessionUser(sessionId: string | undefined) {
   if (!session) return null;
 
   if (session.expiresAt < new Date()) {
-    // сесія протухла — прибираємо її з БД і повертаємо "не залогінений"
     await db.delete(sessions).where(eq(sessions.id, sessionId));
     return null;
   }

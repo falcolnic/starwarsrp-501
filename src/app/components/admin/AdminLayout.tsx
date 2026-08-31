@@ -9,6 +9,7 @@ const NAV_ITEMS = [
     { to: "/admin/users", label: "Пользователи", icon: UserCog, minRole: "superadmin" as const },
     { to: "/admin/zergs", label: "Зерги", icon: Bug, minRole: "admin" as const },
     { to: "/admin/droids", label: "Дроиды", icon: Cpu, minRole: "admin" as const },
+    { to: "/admin/audit", label: "Аудит действий", icon: LogOut, minRole: "superadmin" as const },
 ];
 
 export function AdminLayout() {
@@ -48,9 +49,9 @@ export function AdminLayout() {
                     to={item.to}
                     className="flex items-center gap-2.5 px-5 py-2.5 font-mono text-xs uppercase tracking-[0.08em] transition-colors"
                     style={({ isActive }) => ({
-                    color: isActive ? "var(--primary)" : "var(--muted-foreground)",
-                    background: isActive ? "rgba(61,111,196,0.08)" : "transparent",
-                    borderLeft: isActive ? "2px solid var(--primary)" : "2px solid transparent",
+                        color: isActive ? "var(--primary)" : "var(--muted-foreground)",
+                        background: isActive ? "rgba(61,111,196,0.08)" : "transparent",
+                        borderLeft: isActive ? "2px solid var(--primary)" : "2px solid transparent",
                     })}
                 >
                     <Icon size={14} />
