@@ -26,7 +26,7 @@ const ACTION_LABELS = {
     delete: "Удаление",
 };
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 25;
 
 export function AdminAuditPage() {
     const [logs, setLogs] = useState<AuditLogRow[]>([]);
