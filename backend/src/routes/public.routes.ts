@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { getAllRanks, getRankRequirements } from "../services/rank.service.js";
-import { getAllDocuments } from "../services/document.service.js";
 import { getAllZergs } from "../services/zerg.service.js";
 import { getAllDroids } from "../services/droid.service.js";
 import { getAllSoldiers } from "../services/soldiers.service.js";
 import { getAllBlacklistEntries } from "../services/blacklist.service.js";
+import { getContentByKey } from "../services/content.service.js";
+
 const router = Router();
 
 router.get("/ranks", async (_req, res) => {
@@ -14,7 +15,7 @@ router.get("/ranks", async (_req, res) => {
 
 router.get("/soldiers", async (_req, res) => {
   const list = await getAllSoldiers();
-  res.json(await getAllSoldiers());
+  res.json(list);
 });
 
 router.get("/ranks/:id/requirements", async (req, res) => {
@@ -27,9 +28,9 @@ router.get("/ranks/:id/requirements", async (req, res) => {
   res.json(requirements);
 });
 
-router.get("/docs", async (_req, res) => {
-  const docs = await getAllDocuments();
-  res.json(docs);
+router.get("/content/:key", async (req, res) => {
+  const content = await getContentByKey(req.params.key);
+  res.json(content || { content: "" });
 });
 
 router.get("/blacklist", async (_req, res) => {

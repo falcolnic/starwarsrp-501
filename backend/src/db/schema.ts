@@ -82,13 +82,11 @@ export const rankRequirements = mysqlTable("rank_requirements", {
 });
 
 // ============ DOCUMENTS ============
-export const documents = mysqlTable("documents", {
+export const siteContent = mysqlTable("site_content", {
   id: int("id").autoincrement().primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description"),
-  url: varchar("url", { length: 512 }).notNull(),
-  category: varchar("category", { length: 64 }),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  key: varchar("key", { length: 64 }).notNull().unique(),
+  content: text("content").notNull(), 
+  updatedBy: varchar("updated_by", { length: 128 }), 
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
 });
 

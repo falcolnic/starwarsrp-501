@@ -9,6 +9,7 @@ const NAV_ITEMS = [
     { to: "/admin/users", label: "Пользователи", icon: UserCog, minRole: "superadmin" as const },
     { to: "/admin/zergs", label: "Зерги", icon: Bug, minRole: "admin" as const },
     { to: "/admin/droids", label: "Дроиды", icon: Cpu, minRole: "admin" as const },
+    { to: "/admin/content", label: "Контент сайта", icon: Shield, minRole: "superadmin" as const },
     { to: "/admin/audit", label: "Аудит действий", icon: LogOut, minRole: "superadmin" as const },
 ];
 

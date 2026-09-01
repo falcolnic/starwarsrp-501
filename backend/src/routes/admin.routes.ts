@@ -18,7 +18,7 @@ import {
   updateBlacklistEntry,
   deleteBlacklistEntry,
 } from "../services/blacklist.service.js";
-import { createDocument, updateDocument, deleteDocument } from "../services/document.service.js";
+import { getContentByKey, upsertContent } from "../services/content.service.js";
 import { getAllUsers, updateUserRole } from "../services/user.service.js";
 import {
   createSoldier,
@@ -377,56 +377,38 @@ router.delete("/blacklist/:id", requireRole("superadmin"), asyncHandler(async (r
 }));
 
 // ============ DOCUMENTS ============
-router.post("/docs", requireRole("superadmin"), asyncHandler(async (req, res) => {
-  const parsed = docSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
+const siteContentSchema = z.object({
+  content: z.string().min(1, "Содержимое не может быть пустым"),
+});
 
-  const created = await createDocument(parsed.data);
-  await logAudit({
-    userId: req.currentUser!.id,
-    action: "create",
-    entityType: "document",
-    entityId: created.id,
-    after: created,
-  });
-
-  res.status(201).json(created);
+router.get("/content/:key", asyncHandler(async (req, res) => {
+  const content = await getContentByKey(req.params.key);
+  res.json(content || { content: "" });
 }));
 
-router.patch("/docs/:id", requireRole("superadmin"), asyncHandler(async (req, res) => {
-  const id = Number(req.params.id);
-  const parsed = docSchema.partial().safeParse(req.body);
+router.put("/content/:key", requireRole("superadmin"), asyncHandler(async (req, res) => {
+  const parsed = siteContentSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
-  const result = await updateDocument(id, parsed.data);
-  if (!result) return res.status(404).json({ error: "Документ не найден" });
+  const existing = await getContentByKey(req.params.key);
+  const updatedBy = req.currentUser!.displayName || req.currentUser!.username || "System";
+
+  const updated = await upsertContent(
+    req.params.key, 
+    parsed.data.content, 
+    updatedBy
+  );
 
   await logAudit({
     userId: req.currentUser!.id,
-    action: "update",
-    entityType: "document",
-    entityId: id,
-    before: result.before,
-    after: result.after,
+    action: existing ? "update" : "create",
+    entityType: "site_content",
+    entityId: req.params.key,
+    before: existing,
+    after: updated,
   });
 
-  res.json(result.after);
-}));
-
-router.delete("/docs/:id", requireRole("superadmin"), asyncHandler(async (req, res) => {
-  const id = Number(req.params.id);
-  const deleted = await deleteDocument(id);
-  if (!deleted) return res.status(404).json({ error: "Документ не найден" });
-
-  await logAudit({
-    userId: req.currentUser!.id,
-    action: "delete",
-    entityType: "document",
-    entityId: id,
-    before: deleted,
-  });
-
-  res.json({ ok: true });
+  res.json(updated);
 }));
 
 // ============ USERS ============

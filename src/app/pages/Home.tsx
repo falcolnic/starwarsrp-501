@@ -7,7 +7,7 @@ import { useTypewriter } from "../../hooks/useTypewriter";
 
 import { SectionDecor, CornerDecoration, HeroEmblem } from "../components/ui/HomeDecorations";
 import { HudButton, AccordionTab, PlaceholderText } from "../components/ui/HomeComponents";
-import { homeTabs } from "../../data/homeTabs";
+import { useHomeTabs } from "../../data/homeTabs";
 import { GlitchText } from "../components/GlitchText";
 import { InfoTicker } from "../components/ui/InfoTicker";
 import { BlacklistModal } from "../components/BlackListModal";
@@ -15,7 +15,7 @@ import { BlacklistModal } from "../components/BlackListModal";
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";
   const { displayed, done } = useTypewriter(subtitleText, 26, 900);
-
+  const { tabs, loading } = useHomeTabs();
   const welcomeRef = useEntrance(0);
   const tabsLabelRef = useEntrance(0);
 
@@ -33,7 +33,6 @@ export function Home() {
     heroRef.current.style.setProperty("--mouse-y", `${y}px`);
   };
 
-  const [isGameOpen, setIsGameOpen] = useState(false);
   return (
     <div>
       <section 
@@ -153,7 +152,9 @@ export function Home() {
         </div>
 
         <div className="flex flex-col gap-1">
-          {homeTabs.map((tab, i) => <AccordionTab key={tab.id} tab={tab} index={i} />)}
+          {tabs.map((tab, i) => (
+                <AccordionTab key={tab.id} tab={tab} index={i} />
+            ))}
         </div>
 
         <SectionDecor />

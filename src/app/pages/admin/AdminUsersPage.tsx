@@ -14,8 +14,8 @@ interface AdminUserRow {
 
 const ROLE_LABELS: Record<AdminUserRow["role"], string> = {
     user: "Пользователь",
-    admin: "Админ",
-    superadmin: "Супер-админ",
+    admin: "Интендант",
+    superadmin: "Адмиралы",
 };
 
 const ITEMS_PER_PAGE = 25;

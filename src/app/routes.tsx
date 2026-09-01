@@ -26,6 +26,7 @@ import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
 import { AdminZergsPage } from "./pages/admin/AdminZergsPage";
 import { AdminDroidsPage } from "./pages/admin/AdminDroidsPage";
 import { AdminAuditPage } from "./pages/admin/AdminAuditPage";
+import { AdminContentPage } from "./pages/admin/AdminContentPage";
 
 
 const MIN_LOADER_DURATION = 8000;
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
           { path: "users", Component: AdminUsersPage },
           { path: "zergs", Component: AdminZergsPage },
           { path: "droids", Component: AdminDroidsPage },
+          { path: "content", Component: AdminContentPage },
           { path: "audit", Component: AdminAuditPage },
         ],
       },

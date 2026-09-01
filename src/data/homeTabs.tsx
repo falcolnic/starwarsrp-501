@@ -1,342 +1,165 @@
+import { useEffect, useState } from "react";
 import { FileText, Sword, Code2, Map, Archive, BookOpen, ChevronRight, Bot, ShieldHalf, Users2, Shield, Briefcase } from "lucide-react";
 import { Link } from "react-router";
-import { useState } from "react";
 
-function OathTabContent() {
+function OathTabContent({ text }: { text: string }) {
     const [npz, setNpz] = useState("");
+    const parts = text.split("{{npz}}");
 
     return (
         <div className="flex flex-col gap-2">
             <div className="border-l-2 border-[var(--primary)] pl-4 font-sans text-base text-[var(--muted-foreground)] leading-relaxed italic">
-                «Я,{" "}
-                <input
-                    type="text"
-                    value={npz}
-                    onChange={(e) => setNpz(e.target.value)}
-                    placeholder="Введите НПЗ"
-                    className="mx-1.5 px-4 py-0.5 bg-[#080d17] border-b-2 border-[var(--primary)] focus:border-[#2ECC71] text-[var(--chart-3)] placeholder:text-slate-600 font-bold focus:outline-none transition-colors rounded-none w-70 text-center inline-block not-italic"
-                />
-                , принимаю присягу 501 Элитного Штурмового легиона и торжественно клянусь: быть честным, храбрым, дисциплинированным, бдительным бойцом, беспрекословно выполнять воинские уставы, приказы командиров и начальников. Я клянусь добросовестно изучать военное дело, и до последнего вздоха защищать Республику. Я всегда готов встать на защиту Республики и Канцлера, я клянусь защищать мужественно, умело, с достоинством и честью, не щадя своей крови и самой жизни для достижения полной победы над врагами. Если я нарушу мою торжественную клятву то меня ждёт суровая кара Республики , а так-же всеобщая ненависть и презрение.»
+                {parts[0]}
+                {parts.length > 1 && (
+                    <input
+                        type="text"
+                        value={npz}
+                        onChange={(e) => setNpz(e.target.value)}
+                        placeholder="Введите НПЗ"
+                        className="mx-1.5 px-4 py-0.5 bg-[#080d17] border-b-2 border-[var(--primary)] focus:border-[#2ECC71] text-[var(--chart-3)] placeholder:text-slate-600 font-bold focus:outline-none transition-colors rounded-none w-70 text-center inline-block not-italic"
+                    />
+                )}
+                {parts.length > 1 && parts[1]}
             </div>
         </div>
     );
 }
 
-export const homeTabs = [
-    { 
-        id: "charter", 
-        label: "УСТАВ ПОДРАЗДЕЛЕНИЯ", 
-        icon: <FileText size={16} />, 
-        content: (
-            <div className="font-sans text-sm text-[var(--muted-foreground)] leading-relaxed space-y-8 max-h-[70vh] overflow-y-auto pr-4 custom-scrollbar">
-                <section>
-                    <h4 className="text-[var(--foreground)] font-bold uppercase tracking-[0.1em] text-base mb-4 border-b border-[var(--border)] pb-2">
-                        Общие положения
-                    </h4>
-                    <ul className="list-disc pl-5 space-y-2.5">
-                        <li>
-                            Рапорта после специальных операций пишутся позади строя на С-2 через КПК (карманный персональный компьютер). Запрещено писать рапорта стоя упором лицом к стене.
-                        </li>
-                        <li>
-                            Школы проводятся в специально отведенных местах (Казарма, Лекционные комнаты). Запрещено каким-либо образом мешать преподавателю во время проведения лекции/практики (находиться в коммуникаторе Школа №1-2 без разрешения, перебивать, отвлекать на аванпосте и вне его).
-                        </li>
-                        <li>
-                            Во время Спец. операций (по зачистки зергов/ликвидации дроидов/красный код/сбор кристаллов и т.п.), тренировок и спец. тренировок всем бойцам обязательно находиться в Коммуникаторе №1-2.
-                        </li>
-                        <li>
-                            Во время тренировочной спец. операции «Превосходство», всем бойцам обязательно находиться в Коммуникаторе/Комлинке.
-                        </li>
-                        <li>
-                            Один из представителей 501-го, обязан находиться в голосовом коммуникаторе "Межлегионная частота" во время спец. операции по зачистки зергов/ликвидации дроидов/красный код/сбор кристаллов и т.п.
-                        </li>
-                        <li>
-                            Любые прикомандирования/прохождение курсов/вступление в любое отряды/контракты, без согласования с командирским составом, запрещены.
-                        </li>
-                        <li>
-                            Старший боец в Коммуникаторе/Комлинке имеет право менять между собой статус канала RP на NRP и обратно. 
-                        </li>
-                        <li>
-                            В теги разрешено записывать только меж. легионные отряды и отряды 501. Также разрешено ставить "РХБЗ" и подобные регламентированные теги. <span className="text-[var(--primary)]/90">[Исключение: распределение по командам на спец. тренировках, тренировках, ВрИО, уполномоченные КМД составом]</span>.
-                        </li>
-                        <li>
-                            Запрещены любые сокращения звания и уставного лексикона, по типу: “ТТ - Так точно”, “т. КК разрешите обратиться” и подобные. <span className="text-[var(--primary)]/90">[Исключение: Спец. тренировки, тренировки, квалификации, спец. операции, красный код, а так-же разрешены сокращения званий в локальном чате/чате легиона]</span>.
-                        </li>
-                        <li>
-                            При отсутствии в расположении гарнизона, в течении 14-ти календарных дней, без уведомления командования и взятии отпуска/запаса - боец исключается из легиона.
-                        </li>
-                        <li>
-                            После боевых операций со сбором на плацу, необходимо незамедлительно построиться у казармы, и совместно со строем выдвигаться на плац. После боевых операций без сбора на плацу, необходимо незамедлительно построиться у казармы, и строем идти на С-2.
-                        </li>
-                        <li>
-                            Выход в авангард бойцам ниже звания Младшего Офицера, на спец. операции Зачистка, осуществляется с разрешения старшего активного бойца подразделения и КМДО, но в случае если СПЗ стоит на КМДО должен дать разрешение следующий боец по старшинству.
-                        </li>
-                        <li>
-                            Учет бойцов легиона ведется в таблице интендантами. Все бойцы обязаны отписывать в канал перепись-бойцов после повышения/смены позывного/смены должности. На написание в перепись даётся 24 часа, затем следуют санкции: 1 нарушение — Выговор, повторное нарушение — понижение на исходное звание. Взыскание выдаётся комендантами после получения уведомления от интендантов. <span className="text-[var(--primary)]/90">[Исключение: новоприбывшие в легион бойцы, которые не прошли КМБ]</span>.
-                        </li>
-                        <li>
-                            Распределение состава после спецоперации проводит старший по званию офицер/сержант. <span className="text-[var(--primary)]/90">[Исключение: если боец не может проводить распределение по уважительной причине, то полномочия распределения передаются бойцу следующему по званию]</span>.
-                        </li>
-                        <li>
-                            Командирский состав 501-го и коменданты имеют право отменить повышение в случае необходимости проведения дисциплинарных мероприятий.
-                        </li>
-                        <li>
-                            Проведение "Школы штурма" разрешено со звания Штаб-сержант и выше. Минимально количество бойцов 3 (не включая проводящего).
-                        </li>
-                        <li>
-                            Бойцы ЭРК внутри подразделения имеют право действовать обособленно от основного состава на боевых/учебных операций с целью выполнения поставленных задач, не подчиняясь указаниям командующего строем. Могут самостоятельно формулировать для себя второстепенные задачи в рамках выполнения основной задачи, если это не противоречит уставу и целям операции, неся тем самым персональную ответственность за свои действия.
-                        </li>
-                        <li>
-                            По истечению каждой недели, начальники отрядов/отделов/RD/COM/INT, а также Начальники офицеров/сержантов, обязаны подать отчет о еженедельной деятельности в соответствующий канал.
-                        </li>
-                        <li>
-                            При прохождении школ в 501 Э.Ш.Л. действует следующий порядок действий: 1 Теоретическая лекция - 1 день, вся практическая часть может быть проведена за 1 день. <span className="text-[var(--primary)]/90">[Исключение: ускоренный курс]</span>.
-                        </li>
-                        <li>
-                            В случае, если боец допустил нарушение, находясь в строю, комендант, имеет право самовольно выйти из строя с целью пресечения нарушения и проведения последующего разбирательства.
-                        </li>
-                        <li>
-                            На редактирование рапорта в рапортах-тренировки/школы/операции даётся ровно 24 часа, после уведомления от Интенданта. Интенданты обязаны проверять рапорта за 24 часа. Если рапорт не проверен по истечении этого срока, он считается автоматически одобренным, а для отдела Интендантов данный пропуск идет в счет ошибок отдела, подсчитываемых еженедельно. Начальник Интендантов может применять меры дисциплинарных взысканий как к конкретному бойцу, так и ко всему отделу исходя из личной оценки допущенных ошибок.
-                        </li>
-                        <li>
-                            Интенданты имеют право рассмотреть и одобрить отпуск, в случае если он не превышает ограниченного срока в 15 дней и у бойца менее 1 (одного) активного выговора. На проверку даётся ровно 24 часа. Начальник Интендантов может самостоятельно устанавливать кто имеет право одобрить отпуск.
-                        </li>
-                        <li>
-                            Коменданты имеют право отказать в отработке взысканий и налагать временный запрет на отработку на свое усмотрение, однако причина отказа/запрета должна быть четко аргументирована. На время запрета на отработку срок отработки выговора продлевается соответственно сроку запрета.
-                        </li>
-                        <li>
-                            Бойцу, которому предоставлен ускоренный курс, отводится 22 календарных дня на его прохождение. По истечении указанного срока без успешного завершения ускоренный курс аннулируется, а боец понижается до звания Рядовой-рекрут.
-                        </li>
-                        <li>
-                            Если боец не сможет присутствовать на собрании 501 Э.Ш.Л. он должен отписать отпуск на время проведения собрания, уведомив командирский состав об уважительной причине отсутствия, с момента объявления о грядущем собрании. Если боец не присутствовал на собрании 501 Э.Ш.Л. ему разрешается уведомить командирский состав о неявке на собрание с пояснением уважительной причины до конца календарного дня, когда было проведено собрание. При пропуске данного срока - выносится выговор за халатное отношение к службе. <span className="text-[var(--primary)]/90">[Исключение: рядовой состав 501-го Э.Ш.Л. может не присутствовать на собрании]</span>.
-                        </li>
-                    </ul>
-                </section>
+export function useHomeTabs() {
+    const [content, setContent] = useState({
+        charter: "",
+        oath: "",
+        coding: "",
+        documents: [] as any[]
+    });
+    const [loading, setLoading] = useState(true);
 
-                <section>
-                    <h4 className="text-[var(--foreground)] font-bold uppercase tracking-[0.1em] text-base mb-4 border-b border-[var(--border)] pb-2">
-                        Отпуск
-                    </h4>
-                    <ol className="list-decimal pl-5 space-y-2.5">
-                        <li>
-                            При уходе в отпуск все выговоры бойца замораживаются <span className="text-[var(--primary)]/90">[Исключения: наличие 3 и более активных выговоров; уход в отпуск по причине намеренной отсрочки в отработке выговоров]</span>.
-                        </li>
-                        <li>
-                            При уходе в отпуск с таких званий как: Сержант-майор сухопутных войск, Полковник, Клон Маршал, боец должен подготовить себе замену.
-                        </li>
-                        <li>
-                            Отпуск возможен на срок до 30 (тридцати) календарных дней.
-                        </li>
-                        <li>
-                            Отпуск можно брать не чаще, чем раз в 30 (тридцать) календарных дней <span className="text-[var(--primary)]/90">[Исключение: экстренная необходимость, обсуждается с Командирским составом 501-го Э.Ш.Л.]</span>.
-                        </li>
-                        <li>
-                            Отпуск одобряет Командирский состав 501-го Э.Ш.Л., а также Интенданты, согласно п. 23 Устава 501 Э.Ш.Л.
-                        </li>
-                        <li>
-                            Если боец, находящийся в отпуске с хотя бы 1 (одним) замороженным выговором продолжает проявлять активность (проведение/участие в деятельности), то отпуск должен быть анулирован <span className="text-[var(--primary)]/90">[Исключения: участие в авто-ивентах не учитывается; также согласование с КМД составом или приказ Подполковника и выше (в том числе КМДО(Б)/ЗКМДО(Б)) - в этом случае в примечании к деятельности должно указыватся это основание]</span>.
-                        </li>
-                        <li>
-                            Решение об анулировании отпуска принимается Командирским составом 501-го Э.Ш.Л. на основании обращения о замеченном нарушении от старшего Коменданта, либо по собственному решению КМД.
-                        </li>
-                        <li>
-                            По решению начальника Комендантов, или Командира, курирующего Комендантов, или Клона Маршала, боец может отработать выговор во время отпуска.
-                        </li>
-                    </ol>
-                </section>
+    useEffect(() => {
+        async function fetchTabs() {
+            try {
+                const [charterRes, oathRes, codingRes, docsRes] = await Promise.all([
+                    fetch("/api/content/tab_charter").then(r => r.json()),
+                    fetch("/api/content/oath_text").then(r => r.json()),
+                    fetch("/api/content/tab_coding").then(r => r.json()),
+                    fetch("/api/content/tab_documents").then(r => r.json())
+                ]);
 
-                {/* Запас */}
-                <section>
-                    <h4 className="text-[var(--foreground)] font-bold uppercase tracking-[0.1em] text-base mb-4 border-b border-[var(--border)] pb-2">
-                        Запас
-                    </h4>
-                    <ol className="list-decimal pl-5 space-y-2.5">
-                        <li>
-                            При уходе в запас боец не должен иметь активных выговоров <span className="text-[var(--primary)]/90">[Исключение: Если у бойца есть проблемы, из-за которых он не может отработать взыскание, он имеет право подать на заморозку выговора и запас для их решения]</span>.
-                        </li>
-                        <li>
-                            Запас одобряет Командирский состав 501-го Э.Ш.Л., предварительно побеседовав с бойцом.
-                        </li>
-                        <li>
-                            Запас возможен на срок от 1 месяца (30 дней) до 6 месяцев.
-                        </li>
-                        <li>
-                            Командирский состав 501-го Э.Ш.Л. вправе аннулировать запас бойца в экстренных случаях, определяемых из личной оценки КМД.
-                        </li>
-                        <li>
-                            Запас могут брать бойцы в звании Сержант и выше <span className="text-[var(--primary)]/90">[Исключение: Решение КМД состава]</span>.
-                        </li>
-                        <li>
-                            Запас запрещается брать 2 раза подряд и более <span className="text-[var(--primary)]/90">[Исключение: Решение КМД состава]</span>.
-                        </li>
-                        <li>
-                            Бойцу, который находится в запасе, разрешено участвовать в деятельности подразделения/появляться в рапортах, но запрещено повышаться и проходить школы/экзамены для повышения.
-                        </li>
-                        <li>
-                            В случае получения выговора во время какой-либо деятельности бойцом, который находится в запасе, срок запаса мгновенно аннулируется.
-                        </li>
-                        <li>
-                            При уходе в запас боец понижается до минимального звания в своей "ветке" и снимается со всех занимаемых должностей <span className="text-[var(--primary)]/90">[Офицерский/Старший офицерский состав → «Капитан», Мл. офицерский состав → «Лейтенант», Сержантский/Старший сержантский состав → «Сержант», Мл. сержантский/Рядовой состав → «Рядовой»]</span>.
-                        </li>
-                        <li>
-                            При выходе из запаса, бойцу в звании «Капитан» или «Лейтенант» необходимо пройти экзамен у Командирского состава 501-го Э.Ш.Л. До успешной сдачи экзамена данный боец не может проводить никакие деятельности, все его полномочия замораживаются. На прохождение дается 3 попытки. После третьей провальной попытки боец понижается до звания «Сержант-майор» или любого другого звания, определяемого КМД. По решению КМД состава данный экзамен может быть аннулирован.
-                        </li>
-                        <li>
-                            Боец, ушедший в запас, но желающий продолжить работу в отделе, может запросить разрешение у состава КМД право на это. Звание, которое на это время остается у бойца, обсуждается также с КМД.
-                        </li>
-                    </ol>
-                </section>
+                let parsedDocs = [];
+                try {
+                    if (docsRes.content) parsedDocs = JSON.parse(docsRes.content);
+                } catch (e) {
+                    console.error("Ошибка парсинга документов (ожидался JSON)", e);
+                }
 
-                <section>
-                    <h4 className="text-[var(--foreground)] font-bold uppercase tracking-[0.1em] text-base mb-4 border-b border-[var(--border)] pb-2">
-                        Внутренний лексикон
-                    </h4>
-                    <div className="space-y-4 border-l-2 border-[var(--primary)]/30 pl-4 py-1 bg-[var(--primary)]/5 rounded-r-md">
-                        <p>
-                            При получении приказа/задачи, если военнослужащему понятен приказ/задача, то ему следует отвечать <strong className="text-[var(--foreground)]">"Есть"</strong> или <strong className="text-[var(--foreground)]">"Есть (приказ/задача)"</strong>. При получении выговора непосредственно от начальника/старшего по званию, военнослужащему следует ответить <strong className="text-[var(--foreground)]">"Есть выговор"</strong>.
-                        </p>
-                        <p>
-                            При получении рекомендации по службе непосредственно от начальника/старшего по званию, военнослужащему следует ответить: <strong className="text-[var(--foreground)]">"Служу Республике и 501-му Элитному Штурмовому Легиону"</strong>.
-                        </p>
-                        <p>
-                            После выполнения приказа/задачи/взыскания, военнослужащий обязан обратиться к начальнику/старшему по званию по форме: <strong className="text-[var(--foreground)]">«Разрешите доложить товарищ, Звание»</strong>. После одобрения, боец докладывает о выполнении приказа/задачи/взыскания по форме: <strong className="text-[var(--foreground)]">«Докладывает Номер | Позывной | Звание, (Озвучить выполненную задачу/приказ/взыскание), доклад окончен!»</strong>.
-                        </p>
-                    </div>
-                </section>
+                setContent({
+                    charter: charterRes.content || "<p>Устав не заполнен</p>",
+                    oath: oathRes.content || "Текст присяги не найден.",
+                    coding: codingRes.content || "<p>Кодировка не заполнена</p>",
+                    documents: parsedDocs
+                });
+            } catch (error) {
+                console.error("Ошибка загрузки вкладок", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchTabs();
+    }, []);
 
-            </div>
-        )
-    },
-    {
-        id: "oath", 
-        label: "ПРИСЯГА БОЙЦА", 
-        icon: <Sword size={16} />,
-        content: <OathTabContent />,
-    },
-    {
-        id: "coding", 
-        label: "КОДИРОВКА ПОДРАЗДЕЛЕНИЯ", 
-        icon: <Code2 size={16} />,
-        content: (
-            <div className="flex flex-col gap-2">
-                <span className="font-sans text-sm text-[var(--muted-foreground)] leading-relaxed">
-                    Коды — самый быстрый способ отдать приказ. Используются для сбора подразделения на определенных точках, переклички состава и обозначения местоположения. 
-                </span>
-                <p className="font-sans text-sm text-[var(--accent-foreground)]">Коды можно отправлять в чат подразделения со звания <span className="text-[var(--chart-3)] text-base underline">Капрал+</span>.</p>
-                <div className="bg-slate-900/80 border border-[var(--border)] p-4 font-mono text-sm text-[var(--muted-foreground)] leading-relaxed">
-                    <div className="text-[var(--foreground)]">Код-0<span className="text-[var(--muted-foreground)]"> — общая перекличка в чате легиона.</span></div>
-                    <p>При виде данного кода вам необходимо отписать в чат легиона "+".</p>
-                    <p>Если боец находится на каком-либо мероприятии, то дополнительно указывается деятельность, которой занят. Пример: + (тренировка)</p>
-                    <br />
-                    <div className="text-[var(--foreground)]">C-99<span className="text-[var(--muted-foreground)]"> — местоположение определенного бойца/круга лиц.</span></div>
-                    <p>При виде данного кода вам необходимо отписать в чат легиона ваше местоположение.</p>
-                    <p>Можно использовать в ограниченных кругах бойцов.</p>
-                    <p>Пример: C-99, Офицерский состав.</p>
-                    <div className="mt-3 text-[var(--primary)]">Коды мест сбора</div>
-                    <div className="text-[var(--foreground)]">C-1<span className="text-[var(--muted-foreground)]"> — сбор у Главных ворот.</span></div>
-                    <div className="text-[var(--foreground)]">C-2<span className="text-[var(--muted-foreground)]"> — сбор в 2 Ангаре.</span></div>
-                    <div className="text-[var(--foreground)]">C-3<span className="text-[var(--muted-foreground)]"> — сбор на плацу.</span></div>
-                    <div className="text-[var(--foreground)]">C-4<span className="text-[var(--muted-foreground)]"> — сбор возле Казармы 501.</span></div>
-                    <div className="text-[var(--foreground)]">C-5<span className="text-[var(--muted-foreground)]"> — взятие/сдача основного вооружения и сбор возле Оружейной комнаты.</span></div>
+    const tabs = [
+        { 
+            id: "charter", 
+            label: "УСТАВ ПОДРАЗДЕЛЕНИЯ", 
+            icon: <FileText size={16} />, 
+            content: loading ? <div className="text-[var(--muted-foreground)]">Загрузка...</div> : (
+                <div 
+                    className="font-sans text-sm text-[var(--muted-foreground)] leading-relaxed space-y-8 max-h-[70vh] overflow-y-auto pr-4 custom-scrollbar"
+                    dangerouslySetInnerHTML={{ __html: content.charter }} // Вставляет HTML из БД
+                />
+            )
+        },
+        {
+            id: "oath", 
+            label: "ПРИСЯГА БОЙЦА", 
+            icon: <Sword size={16} />,
+            content: loading ? <div className="text-[var(--muted-foreground)]">Загрузка...</div> : <OathTabContent text={content.oath} />,
+        },
+        {
+            id: "coding", 
+            label: "КОДИРОВКА ПОДРАЗДЕЛЕНИЯ", 
+            icon: <Code2 size={16} />,
+            content: loading ? <div className="text-[var(--muted-foreground)]">Загрузка...</div> : (
+                <div 
+                    className="flex flex-col gap-2"
+                    dangerouslySetInnerHTML={{ __html: content.coding }} // Вставляет HTML из БД
+                />
+            ),
+        },
+        {
+            id: "documents",
+            label: "ДОКУМЕНТЫ",
+            icon: <Archive size={16} />,
+            content: loading ? <div className="text-[var(--muted-foreground)]">Загрузка...</div> : (
+                <div className="flex flex-col gap-2">
+                    {content.documents.map((doc, i) => {
+                        const isExternal = doc.href.startsWith("http");
+                        const DocIcon = doc.icon === "Briefcase" ? Briefcase : FileText;
+
+                        const innerContent = (
+                            <>
+                                <DocIcon size={16} className="text-[var(--primary)] shrink-0 mt-0.5" />
+                                <div className="flex-1">
+                                    <h4 className="font-mono text-sm text-white group-hover:text-[var(--primary)] transition-colors">
+                                        {doc.title}
+                                    </h4>
+                                    <p className="mt-1 text-xs text-[var(--muted-foreground)] leading-relaxed">
+                                        {doc.description}
+                                    </p>
+                                </div>
+                                <ChevronRight size={16} className="text-gray-500 group-hover:text-[var(--primary)] transition-all group-hover:translate-x-1 shrink-0" />
+                            </>
+                        );
+
+                        const wrapperClass = "group flex items-start gap-3 p-3 bg-slate-900/40 border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-slate-900/60";
+
+                        return isExternal ? (
+                            <a key={i} href={doc.href} target="_blank" rel="noopener noreferrer" className={wrapperClass}>
+                                {innerContent}
+                            </a>
+                        ) : (
+                            <Link key={i} to={doc.href} className={wrapperClass}>
+                                {innerContent}
+                            </Link>
+                        );
+                    })}
                 </div>
-            </div>
-        ),
-    },
-    {
-        id: "documents",
-        label: "ДОКУМЕНТЫ",
-        icon: <Archive size={16} />,
-        content: (
-            <div className="flex flex-col gap-2">
-                {[
-                    {
-                        title: "Устав ВАР",
-                        description: "В данном документе описаны основные нормы и правила действующие на базе.",
-                        href: "https://docs.google.com/document/d/1RJt-qGdLTiYQWfm26qIc4nSon--kfLAQ0r5IMVbfYeY",
-                    },
-                    {
-                        title: "Правила SWRP",
-                        description: "В данном документе описаны основные нормы и правила действующие на сервере.",
-                        href: "https://docs.google.com/document/d/1_rg2zg6sd3XHHawp5mcjzBH151VUHBk0PIgFi8tn4N0",
-                    },
-                    {
-                        title: "Звания подразделений",
-                        description: "В данном документе описаны наименования и иерархия званий для каждого подразделения, а также их приравнивание.",
-                        href: "https://docs.google.com/spreadsheets/d/1Hp8jKji9ukWFPrjqNLTTvOmmSO09Hcpm9rWRijQd5oU",
-                    },
-                ].map((doc) => (
-                    <a
-                        key={doc.href}
-                        href={doc.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex items-center gap-3 p-3 bg-slate-900/40 border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-slate-900/60"
-                    >
-                        <FileText
-                            size={16}
-                            className="text-[var(--primary)] shrink-0 mt-0.5"
-                        />
-                        <div className="flex-1">
-                            <h4 className="font-mono text-sm text-white group-hover:text-[var(--primary)] transition-colors">
-                                {doc.title}
-                            </h4>
-                            <p className="mt-1 text-xs text-[var(--muted-foreground)] leading-relaxed">
-                                {doc.description}
-                            </p>
-                        </div>
-                        <ChevronRight
-                            size={16}
-                            className="text-gray-500 group-hover:text-[var(--primary)] transition-all group-hover:translate-x-1 shrink-0"
-                        />
-                    </a>
-                ))}
-                <Link
-                    to="/positions"
-                    className="group flex items-start gap-3 p-3 bg-slate-900/40 border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-slate-900/60"
-                >
-                    <Briefcase size={16} className="text-[var(--primary)] shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                        <h4 className="font-mono text-sm text-white group-hover:text-[var(--primary)] transition-colors">
-                            Должности и контракты
-                        </h4>
-                        <p className="mt-1 text-xs text-[var(--muted-foreground)] leading-relaxed">
-                            Отделы легиона, должностные обязанности и полномочия
-                        </p>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-500 group-hover:text-[var(--primary)] transition-all group-hover:translate-x-1 shrink-0" />
-                </Link>
-            </div>
-        ),
-    },
-    {
-        id: "database",
-        label: "БАЗА ДАННЫХ",
-        icon: <BookOpen size={16} />,
-        content: (
-            <div className="flex flex-col gap-2">
-                {[
-                    { title: "Реестр КМД", description: "Исторический архив офицерского и командного состава легиона, разделенный по эпохам.", to: "/commanders", icon: <Shield size={24} /> },
-                    { title: "Зерги", description: "инопланетная раса, представляют собой насекомых-мутантов. Являются второстепенными противниками сил В.А.Р.", to: "/zergs", icon: <Users2 size={24} /> },
-                    { title: "Дроиды", description: "Боевые дроиды КНС. Вооружение, тактика противодействия.", to: "/droids", icon: <Bot size={24} /> },
-                    { title: "Снаряжение бойца", description: "Снаряжение бойца 501 Э.Ш.Л. это неотъемлемый элемент, который будет сопровождать бойцов до конца.", to: "/equipment", icon: <ShieldHalf size={24} /> },
-                ].map((item) => (
-                    <Link
-                        key={item.to}
-                        to={item.to}
-                        className="group flex items-center gap-3 p-3 bg-slate-900/40 border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-slate-900/60"
-                    >
-                        <span className="text-[var(--primary)] shrink-0 mt-0.5">{item.icon}</span>
-                        <div className="flex-1">
-                            <h4 className="font-mono text-sm text-white group-hover:text-[var(--primary)] transition-colors">
-                                {item.title}
-                            </h4>
-                            <p className="mt-1 text-xs text-[var(--muted-foreground)] leading-relaxed">
-                                {item.description}
-                            </p>
-                        </div>
-                        <ChevronRight size={16} className="text-gray-500 group-hover:text-[var(--primary)] transition-all group-hover:translate-x-1 shrink-0" />
-                    </Link>
-                ))}
-            </div>
-        ),
-    },
-];
+            ),
+        },
+        {
+            id: "database",
+            label: "БАЗА ДАННЫХ",
+            icon: <BookOpen size={16} />,
+            content: (
+                <div className="flex flex-col gap-2">
+                    {[
+                        { title: "Реестр КМД", description: "Исторический архив офицерского и командного состава легиона, разделенный по эпохам.", to: "/commanders", icon: <Shield size={24} /> },
+                        { title: "Зерги", description: "инопланетная раса, представляют собой насекомых-мутантов. Являются второстепенными противниками сил В.А.Р.", to: "/zergs", icon: <Users2 size={24} /> },
+                        { title: "Дроиды", description: "Боевые дроиды КНС. Вооружение, тактика противодействия.", to: "/droids", icon: <Bot size={24} /> },
+                        { title: "Снаряжение бойца", description: "Снаряжение бойца 501 Э.Ш.Л. это неотъемлемый элемент, который будет сопровождать бойцов до конца.", to: "/equipment", icon: <ShieldHalf size={24} /> },
+                    ].map((item) => (
+                        <Link key={item.to} to={item.to} className="group flex items-center gap-3 p-3 bg-slate-900/40 border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-slate-900/60">
+                            <span className="text-[var(--primary)] shrink-0 mt-0.5">{item.icon}</span>
+                            <div className="flex-1">
+                                <h4 className="font-mono text-sm text-white group-hover:text-[var(--primary)] transition-colors">{item.title}</h4>
+                                <p className="mt-1 text-xs text-[var(--muted-foreground)] leading-relaxed">{item.description}</p>
+                            </div>
+                            <ChevronRight size={16} className="text-gray-500 group-hover:text-[var(--primary)] transition-all group-hover:translate-x-1 shrink-0" />
+                        </Link>
+                    ))}
+                </div>
+            ),
+        },
+    ];
+
+    return { tabs, loading };
+}
