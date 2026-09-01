@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, TrendingUp, CheckCircle2, Zap, User, BookOpen } from "lucide-react";
+import { ChevronDown, TrendingUp, CheckCircle2, Zap, User, BookOpen, Search } from "lucide-react";
 import { Link } from "react-router";
 
 import { calcDaysAtRank } from "../../services/botData";
@@ -30,6 +30,9 @@ export function Promotion() {
   const [loading, setLoading] = useState(true);
   const [selectedCid, setSelectedCid] = useState<string>("");
   const [dropOpen, setDropOpen] = useState(false);
+  
+  // NEW: Search query state
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { ranks, loading: ranksLoading } = useRanks();
 
@@ -69,6 +72,14 @@ export function Promotion() {
   const completedCount = requirements.filter((r) => r.completed).length;
   const overallPct = requirements.length > 0 ? Math.round((completedCount / requirements.length) * 100) : 100;
 
+  // NEW: Filter soldiers based on search query
+  const filteredSoldiers = soldiers.filter((s) => {
+    const query = searchQuery.toLowerCase();
+    const cs = (s.callsignOverride || s.nickname || "").toLowerCase();
+    const cidStr = s.cid.toLowerCase();
+    return cidStr.includes(query) || cs.includes(query);
+  });
+
   if (ranksLoading || loading) {
     return (
       <div className="min-h-screen text-white flex items-center justify-center font-mono">
@@ -103,16 +114,19 @@ export function Promotion() {
           </Link>
         </div>
 
-        <div className="anim-fade-up mb-6 relative max-w-sm z-5">
+        <div className="anim-fade-up mb-6 relative max-w-sm z-20">
           <div className="font-mono text-sm tracking-widest text-[var(--muted-foreground)] mb-2 uppercase">
             Выбрать бойца
           </div>
           <button
-            onClick={() => setDropOpen((o) => !o)}
+            onClick={() => {
+              setDropOpen((o) => !o);
+              if (!dropOpen) setSearchQuery(""); // Reset search when opening
+            }}
             className="w-full flex items-center justify-between gap-3 px-4 py-2.5 bg-[#0d1829] border border-[var(--border)] text-white cursor-pointer rounded hover:border-[var(--primary)] transition-all duration-150"
           >
             <div className="flex items-center gap-3 text-sm">
-              <span className="font-mono text-xs text-[var(--primary)] font-bold">CID-{selectedCid}</span>
+              <span className="font-mono text-[var(--primary)] font-bold">CID-{selectedCid}</span>
               <span className="font-display tracking-wider font-semibold">{callsign}</span>
             </div>
             <ChevronDown
@@ -124,29 +138,54 @@ export function Promotion() {
           </button>
 
           {dropOpen && (
-            <div className="absolute top-[105%] left-0 right-0 bg-[#0d1829] border border-[var(--border)] rounded shadow-[0_8px_32px_rgba(0,0,0,0.6)] max-h-72 overflow-y-auto z-1">
-              {soldiers.map((s) => {
-                const cs = s.callsignOverride || s.nickname || `CT-${s.cid}`;
-                const isActive = s.cid === selectedCid;
-                return (
-                  <button
-                    key={s.cid}
-                    onClick={() => {
-                      setSelectedCid(s.cid);
-                      setDropOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left border-none border-b border-[var(--border)]/20 last:border-0 cursor-pointer text-white transition-colors duration-150 ${
-                      isActive ? "bg-[var(--primary)]/15" : "bg-transparent hover:bg-[#121f35]"
-                    }`}
-                  >
-                    <span className="font-mono text-xs text-[var(--primary)]">CID-{s.cid}</span>
-                    <span className="font-display text-sm font-semibold truncate">{cs}</span>
-                    <span className="font-mono text-[10px] text-[var(--muted-foreground)] ml-auto truncate">
-                      {s.rank ?? "—"}
-                    </span>
-                  </button>
-                );
-              })}
+            <div className="absolute top-[105%] left-0 right-0 bg-[#0d1829] border border-[var(--border)] rounded shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex flex-col z-50">
+              {/* SEARCH INPUT BAR */}
+              <div className="p-2 border-b border-[var(--border)]/50 bg-[#080d17]">
+                <div className="relative flex items-center">
+                  <Search size={14} className="absolute left-3 text-[var(--muted-foreground)]" />
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="Поиск по CID или позывному..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-black/40 border border-[var(--border)]/30 rounded py-2 pl-9 pr-3 text-sm text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-[var(--primary)] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* LIST BODY */}
+              <div className="max-h-64 overflow-y-auto">
+                {filteredSoldiers.length > 0 ? (
+                  filteredSoldiers.map((s) => {
+                    const cs = s.callsignOverride || s.nickname || `CT-${s.cid}`;
+                    const isActive = s.cid === selectedCid;
+                    return (
+                      <button
+                        key={s.cid}
+                        onClick={() => {
+                          setSelectedCid(s.cid);
+                          setDropOpen(false);
+                          setSearchQuery(""); // Clear search on select
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left border-none border-b border-[var(--border)]/20 last:border-0 cursor-pointer text-white transition-colors duration-150 ${
+                          isActive ? "bg-[var(--primary)]/15" : "bg-transparent hover:bg-[#121f35]"
+                        }`}
+                      >
+                        <span className="font-mono text-xs text-[var(--primary)]">CID-{s.cid}</span>
+                        <span className="font-display text-sm font-semibold truncate">{cs}</span>
+                        <span className="font-mono text-[10px] text-[var(--muted-foreground)] ml-auto truncate">
+                          {s.rank ?? "—"}
+                        </span>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="p-4 text-center font-mono text-xs text-[var(--muted-foreground)]">
+                    БОЕЦ НЕ НАЙДЕН
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

@@ -6,6 +6,11 @@ export interface DbRank {
     order: number;
     description: string | null;
 }
+export interface Rank {
+    id: number;
+    name: string;
+    order: number;
+}
 
 export interface DbRankRequirement {
     id: number;

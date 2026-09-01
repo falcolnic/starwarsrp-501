@@ -73,7 +73,7 @@ export function RankLadder({ ranks, currentRankName, nextRank }: RankLadderProps
             </span>
             <button
             onClick={() => setShowFullLadder(!showFullLadder)}
-            className="flex items-center gap-1.5 px-3 py-1 bg-[#0c1424] hover:bg-[#121f35] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-mono tracking-wider uppercase rounded transition-colors duration-150 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1 bg-[#0c1424] hover:bg-[#121f35] border border-[var(--border)] hover:border-[var(--primary)] text-sm font-mono tracking-wider uppercase rounded transition-colors duration-150 cursor-pointer"
             >
             <Award size={18} className="text-[var(--primary)]" />
             <span>{showFullLadder ? "СВЕРНУТЬ ЛИСТ" : "ПОКАЗАТЬ ВСЕ ЗВАНИЯ"}</span>

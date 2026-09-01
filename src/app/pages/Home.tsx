@@ -11,7 +11,6 @@ import { homeTabs } from "../../data/homeTabs";
 import { GlitchText } from "../components/GlitchText";
 import { InfoTicker } from "../components/ui/InfoTicker";
 import { BlacklistModal } from "../components/BlackListModal";
-import { TacticalCommandCenter } from "../components/TacticalCommandCenter";
 
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";

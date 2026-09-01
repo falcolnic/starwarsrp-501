@@ -32,3 +32,15 @@ export async function getSoldiers(): Promise<Soldier[]> {
     if (!res.ok) throw new Error("Failed to fetch soldiers");
     return res.json() as Promise<Soldier[]>;
 }
+
+export const STATUS_LABELS: Record<string, string> = {
+    active: "Активен",
+    leave: "Отпуск",
+    reserve: "Резерв",
+    medical: "Мед. отвод",
+    training: "Обучение",
+    detached: "Прикомандирован",
+    suspended: "Отстранён",
+    awol: "Самоволка",
+    dismissed: "Уволен",
+};

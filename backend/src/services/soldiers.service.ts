@@ -23,9 +23,15 @@ export async function createSoldier(data: {
     status?: string;
     joinDate?: string | null;
     discordId?: string | null;
+    avatar?: string | null;
+    leaveUntil?: string | null;
+    reserveUntil?: string | null;
+    unitLevel?: number;
+    reprimands?: number;
+    reprimandsFrozen?: boolean;
     commandRole?: string | null;
     commandOrder?: number | null;
-    }) {
+}) {
     const existing = await getSoldierByCid(data.cid);
     if (existing) throw new Error("DUPLICATE_CID");
 
@@ -38,11 +44,15 @@ export async function createSoldier(data: {
         squads: data.squads ?? [],
         attached: data.attached ?? [],
         medals: data.medals ?? [],
-        reprimands: 0,
-        reprimandsFrozen: false,
         status: data.status ?? "active",
         joinDate: data.joinDate ?? null,
         discordId: data.discordId ?? null,
+        avatar: data.avatar ?? null,
+        leaveUntil: data.leaveUntil ?? null,
+        reserveUntil: data.reserveUntil ?? null,
+        unitLevel: data.unitLevel ?? 0,
+        reprimands: data.reprimands ?? 0,
+        reprimandsFrozen: data.reprimandsFrozen ?? false,
         commandRole: data.commandRole ?? null,
         commandOrder: data.commandOrder ?? null,
     });
