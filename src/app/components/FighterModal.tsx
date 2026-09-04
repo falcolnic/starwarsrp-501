@@ -42,6 +42,57 @@ export function calcDaysFromDate(dateStr: string | null): number {
   return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
 }
 
+function getRankImage(rank: string | null): string {
+  if (!rank) return "/ranks/ct-trooper.png";
+
+  switch (rank) {
+    case "Клон Маршал":
+    case "Клон Коммандер":
+    case "Командир первого класса":
+    case "Командир":
+    case "Полковник":
+    case "Подполковник":
+    case "Майор":
+      return "/ranks/ct-commander.png";
+
+    case "Капитан":
+      return "/ranks/ct-captain.png";
+    case "Старший лейтенант":
+    case "Лейтенант":
+    case "Младший лейтенант":
+      return "/ranks/ct-junior-lt.png";
+
+    case "Команд сержант-майор": 
+    case "Сержант-майор сухопутных войск":
+      return "/ranks/ct-command-sgt-major.png";
+    case "Сержант-майор":
+      return "/ranks/ct-sergeant-major.png";
+    case "Первый сержант":
+      return "/ranks/ct-first-sergeant.png";
+    case "Сержант первого класса":
+      return "/ranks/ct-sfc.png";
+
+    case "Штаб-сержант":
+      return "/ranks/ct-staff-sergeant.png";
+    case "Сержант":
+      return "/ranks/ct-sergeant.png";
+    case "Капрал":
+      return "/ranks/ct-corporal.png";
+
+      case "Специалист":
+      return "/ranks/ct-specialist.png";
+    case "Старший рядовой":
+    case "Ефрейтор":
+      return "/ranks/ct-senior.png";
+    case "Рядовой":
+    case "Рядовой-рекрут":
+      return "/ranks/ct-trooper.png";
+
+    default:
+      return "/ranks/ct-trooper.png";
+  }
+}
+
 interface FighterModalProps {
   soldier: Soldier;
   onClose: () => void;
@@ -62,7 +113,9 @@ export function FighterModal({ soldier, onClose }: FighterModalProps) {
   const steamId = soldier.steamId ?? "";
   const discordId = soldier.discordId ?? "";
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
   const [avatarBroken, setAvatarBroken] = useState(false);
+  const rankImageSrc = getRankImage(soldier.rank);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -118,14 +171,14 @@ export function FighterModal({ soldier, onClose }: FighterModalProps) {
         <div className="overflow-y-auto p-6 pb-6">
           <div className="flex items-start gap-5 mb-5 pb-5 border-b border-[var(--border)]/40">
             <div
-              className="w-20 h-20 bg-[var(--primary)]/[0.06] border border-[var(--primary)]/25 flex items-center justify-center shrink-0"
+              className="relative w-22 h-23 bg-[var(--primary)]/[0.06] border border-[var(--primary)]/25 flex items-center justify-center shrink-0 overflow-hidden"
               style={{ clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
             >
-              {soldier.avatar && !avatarBroken ? (
+              {!avatarBroken ? (
                 <img
-                  src={soldier.avatar}
+                  src={rankImageSrc}
                   alt={primaryName}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-top scale-[1.2] origin-top transition-transform"
                   onError={() => setAvatarBroken(true)}
                 />
               ) : (
@@ -256,7 +309,7 @@ export function FighterModal({ soldier, onClose }: FighterModalProps) {
               <div className="flex gap-1.5">
                 {soldier.recentSessions.slice(0, 5).map((s, i) => (
                   <div key={i} className="flex-1 bg-black/40 border border-[var(--border)]/60 px-1.5 py-1.5 text-center">
-                    <div className="font-mono text-[0.65rem] text-[var(--muted-foreground)]/60">{s.date.slice(0, 5)}</div>
+                    <div className="font-mono text-sm text-[var(--muted-foreground)]/60">{s.date.slice(0, 5)}</div>
                     <div className="font-mono text-sm text-[var(--primary)]">{s.duration}м</div>
                   </div>
                 ))}
@@ -266,7 +319,7 @@ export function FighterModal({ soldier, onClose }: FighterModalProps) {
 
           <div className="flex justify-between items-end mb-4 pt-2">
             <Barcode value={cleanNum} />
-            <div className="font-mono text-xs tracking-[0.1em] text-[var(--muted-foreground)]/40 text-right">
+            <div className="font-mono text-sm tracking-[0.1em] text-[var(--muted-foreground)]/40 text-right">
               <div>Э.Ш.Л-501</div>
               <div>REG: {cleanNum}</div>
             </div>
