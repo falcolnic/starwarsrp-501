@@ -6,6 +6,7 @@ const databaseTabs = [
         { to: "/zergs", label: "Зерги", icon: Users2 },
         { to: "/droids", label: "Дроиды", icon: Bot },
         { to: "/equipment", label: "Снаряжение", icon: ShieldHalf },
+        { to: "/radio", label: "Регламент связи", icon: ShieldHalf },
 ];
 
 export function DatabaseLayout() {
