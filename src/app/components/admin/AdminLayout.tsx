@@ -4,12 +4,13 @@ import { useAdminAuth } from "../../admin/AdminAuthContext";
 
 const NAV_ITEMS = [
     { to: "/admin/roster", label: "Личный состав", icon: Users, minRole: "admin" as const },
-    { to: "/admin/ranks", label: "Звания и требования", icon: Shield, minRole: "admin" as const },
+    { to: "/admin/ranks", label: "Звания и требования", icon: Shield, minRole: "superadmin" as const },
     { to: "/admin/blacklist", label: "Чёрный список", icon: Ban, minRole: "admin" as const },
     { to: "/admin/users", label: "Пользователи", icon: UserCog, minRole: "superadmin" as const },
-    { to: "/admin/zergs", label: "Зерги", icon: Bug, minRole: "admin" as const },
-    { to: "/admin/droids", label: "Дроиды", icon: Cpu, minRole: "admin" as const },
+    { to: "/admin/zergs", label: "Зерги", icon: Bug, minRole: "superadmin" as const },
+    { to: "/admin/droids", label: "Дроиды", icon: Cpu, minRole: "superadmin" as const },
     { to: "/admin/content", label: "Контент сайта", icon: Shield, minRole: "superadmin" as const },
+    { to: "/admin/commanders", label: "Командиры", icon: Shield, minRole: "superadmin" as const },
     { to: "/admin/audit", label: "Аудит действий", icon: LogOut, minRole: "superadmin" as const },
 ];
 

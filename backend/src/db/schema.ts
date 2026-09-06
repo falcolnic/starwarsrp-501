@@ -102,6 +102,15 @@ export const auditLogs = mysqlTable("audit_logs", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const commandersRegistry = mysqlTable("commanders_registry", {
+    id: int("id").autoincrement().primaryKey(),
+    rank: varchar("rank", { length: 64 }).notNull(),
+    period: varchar("period", { length: 32 }).notNull(),
+    orderNum: int("order_num").notNull(),
+    idNumber: varchar("id_number", { length: 16 }).notNull(),
+    callsign: varchar("callsign", { length: 128 }).notNull(),
+});
+
 // ============ BLACKLIST / TRAITORS ============
 export const blacklist = mysqlTable("blacklist", {
   id: int("id").autoincrement().primaryKey(),

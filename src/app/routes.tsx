@@ -15,6 +15,7 @@ import { DatabaseLayout } from "./components/database/DatabaseLayout";
 import { PromotionRulesPage } from "./pages/PromotionRulesPage";
 import { ErrorPage } from "./pages/ErrorPage";
 import { Commanders } from "./pages/Commanders";
+import { RadioPage } from "./pages/Radio";
 
 import { AdminAuthProvider } from "./admin/AdminAuthContext";
 import { AdminLayout } from "./components/admin/AdminLayout";
@@ -27,6 +28,7 @@ import { AdminZergsPage } from "./pages/admin/AdminZergsPage";
 import { AdminDroidsPage } from "./pages/admin/AdminDroidsPage";
 import { AdminAuditPage } from "./pages/admin/AdminAuditPage";
 import { AdminContentPage } from "./pages/admin/AdminContentPage";
+import { AdminCommandersPage } from "./pages/admin/AdminCommandersPage";
 
 
 const MIN_LOADER_DURATION = 8000;
@@ -67,6 +69,7 @@ export const router = createBrowserRouter([
           { path: "zergs", Component: AdminZergsPage },
           { path: "droids", Component: AdminDroidsPage },
           { path: "content", Component: AdminContentPage },
+          { path: "commanders", Component: AdminCommandersPage },
           { path: "audit", Component: AdminAuditPage },
         ],
       },
@@ -99,6 +102,7 @@ export const router = createBrowserRouter([
           { path: "zergs", Component: Zergs },
           { path: "droids", Component: Droids },
           { path: "equipment", Component: Equipment },
+          { path: "radio", Component: RadioPage },
         ],
       },
       { path: "*", Component: ErrorPage },

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileText, Sword, Code2, Map, Archive, BookOpen, ChevronRight, Bot, ShieldHalf, Users2, Shield, Briefcase } from "lucide-react";
+import { FileText, Sword, Code2, Map, Archive, BookOpen, ChevronRight, Bot, ShieldHalf, Users2, Shield, Briefcase, Radio } from "lucide-react";
 import { Link } from "react-router";
 
 function OathTabContent({ text }: { text: string }) {
@@ -146,6 +146,7 @@ export function useHomeTabs() {
                         { title: "Зерги", description: "инопланетная раса, представляют собой насекомых-мутантов. Являются второстепенными противниками сил В.А.Р.", to: "/zergs", icon: <Users2 size={24} /> },
                         { title: "Дроиды", description: "Боевые дроиды КНС. Вооружение, тактика противодействия.", to: "/droids", icon: <Bot size={24} /> },
                         { title: "Снаряжение бойца", description: "Снаряжение бойца 501 Э.Ш.Л. это неотъемлемый элемент, который будет сопровождать бойцов до конца.", to: "/equipment", icon: <ShieldHalf size={24} /> },
+                        { title: "Регламент связи", description: "Правила радиообмена, частоты, тен-коды и дисциплина в эфире.", to: "/radio", icon: <Radio size={24} /> },
                     ].map((item) => (
                         <Link key={item.to} to={item.to} className="group flex items-center gap-3 p-3 bg-slate-900/40 border border-[var(--border)] transition-all hover:border-[var(--primary)] hover:bg-slate-900/60">
                             <span className="text-[var(--primary)] shrink-0 mt-0.5">{item.icon}</span>
