@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { X, Heart, Share2 } from "lucide-react"; // <-- Added Share2 icon
+import { X, Heart, Share2, Volume2, VolumeX } from "lucide-react";
 
 interface CantinaHackModalProps {
   isOpen: boolean;
@@ -54,9 +54,9 @@ type QuestionKind = "shape" | "numberColor";
 
 const START_LIVES = 3;
 const IDENTITY_MS = 3000; 
-const BASE_MEMORIZE_MS = 8500; 
+const BASE_MEMORIZE_MS = 9500; 
 const MIN_MEMORIZE_MS = 3000; 
-const BASE_ANSWER_MS = 7000; 
+const BASE_ANSWER_MS = 7800; 
 const MIN_ANSWER_MS = 3000; 
 const DIFFICULTY_STEP = 400;
 const BEST_SCORE_KEY = "gar501_hack_best";
@@ -152,9 +152,9 @@ export function CantinaHackModal({
   const [tiles, setTiles] = useState<TileAttrs[]>([]);
   const [round, setRound] = useState(0);
   const [lives, setLives] = useState(START_LIVES);
-  const [timerPct, setTimerPct] = useState(100);
   const [wasCorrect, setWasCorrect] = useState<boolean | null>(null);
   const [best, setBest] = useState(getBestScore);
+  const [isMuted, setIsMuted] = useState(false);
   
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -166,8 +166,8 @@ export function CantinaHackModal({
   const roundRef = useRef(0);
   const livesRef = useRef(START_LIVES);
   const tilesRef = useRef<TileAttrs[]>([]);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
-  const [shapeQIdentity, setShapeQIdentity] = useState(1);
   const [selectedShape, setSelectedShape] = useState<ShapeId | null>(null);
   const [q1Identity, setQ1Identity] = useState(1);
   const [colorQIdentity, setColorQIdentity] = useState(2);
@@ -188,6 +188,13 @@ export function CantinaHackModal({
     }
   }, []);
 
+  const toggleMusic = () => {
+    if (audioRef.current && isMuted && audioRef.current.paused) {
+      audioRef.current.play().catch(() => {});
+    }
+    setIsMuted(!isMuted);
+  };
+
   const endGame = useCallback(() => {
     clearTimers();
     setPhase("result");
@@ -204,7 +211,6 @@ export function CantinaHackModal({
       MIN_MEMORIZE_MS,
       BASE_MEMORIZE_MS - roundRef.current * DIFFICULTY_STEP
     );
-    setTimerPct(100);
     setPhase("memorize");
   }, []);
 
@@ -216,7 +222,6 @@ export function CantinaHackModal({
     );
     setSelectedShape(null);
     setSelectedColor(null);
-    setTimerPct(100);
     setPhase("answer");
   }, []);
 
@@ -240,7 +245,6 @@ export function CantinaHackModal({
 
     phaseStartRef.current = performance.now();
     phaseDurationRef.current = IDENTITY_MS;
-    setTimerPct(100);
     setPhase("identity");
   }, []);
 
@@ -406,8 +410,9 @@ export function CantinaHackModal({
     const loop = () => {
       const elapsed = performance.now() - phaseStartRef.current;
       const pct = Math.max(0, 100 - (elapsed / duration) * 100);
-      setTimerPct(pct);
-      
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = `${pct}%`;
+      }
       if (pct > 0) {
         rafRef.current = requestAnimationFrame(loop);
       }
@@ -442,16 +447,26 @@ export function CantinaHackModal({
         onClick={(e) => e.stopPropagation()}
         style={{ backgroundImage: `url(${backgroundSrc})`, backgroundSize: "cover", backgroundPosition: "center" }}
       >
-        <audio ref={audioRef} src={musicSrc} loop />
+        <audio ref={audioRef} src={musicSrc} loop muted={isMuted} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/70 pointer-events-none" />
 
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 z-30 text-white/70 hover:text-white transition-colors"
-          aria-label="Закрыть"
-        >
-          <X size={32} />
-        </button>
+        <div className="absolute top-6 right-6 z-30 flex items-center gap-5">
+          <button
+            onClick={toggleMusic}
+            className="text-white/70 hover:text-white transition-colors"
+            aria-label={isMuted ? "Включить музыку" : "Выключить музыку"}
+          >
+            {isMuted ? <VolumeX size={32} /> : <Volume2 size={32} />}
+          </button>
+          
+          <button
+            onClick={onClose}
+            className="text-white/70 hover:text-white transition-colors"
+            aria-label="Закрыть"
+          >
+            <X size={32} />
+          </button>
+        </div>
 
         {phase !== "idle" && phase !== "result" && (
           <div className="absolute top-6 left-8 z-30 flex items-center gap-6">
@@ -489,47 +504,50 @@ export function CantinaHackModal({
             <>
               <div className="w-full max-w-xl h-3 bg-white/15 rounded overflow-hidden mb-10">
                 <div
-                  className="h-full transition-[width] duration-75 ease-linear"
+                  ref={progressBarRef}
+                  className="h-full"
                   style={{
-                    width: `${timerPct}%`,
+                    width: "100%",
                     background: phase === "identity" ? "#e8c67a" : phase === "memorize" ? "#4fa8e0" : "#e8c67a",
                   }}
                 />
               </div>
 
-              <div className="grid grid-cols-4 gap-6 mb-10">
-                {tiles.map((tile, i) => (
-                  <div
-                    key={i}
-                    className="w-56 h-56 md:w-64 md:h-64 rounded-xl overflow-hidden border-2 border-white/20 flex items-center justify-center transition-all"
-                    style={{ background: phase === "identity" ? "#1e2a3d" : isBlank ? "#05070a" : tile.bgColor }}
-                  >
-                    {phase === "identity" && (
-                      <span className="font-mono text-8xl font-bold text-white">{tile.identity}</span>
-                    )}
+              {!isBlank && (
+                <div className="grid grid-cols-4 gap-6 mb-10">
+                  {tiles.map((tile, i) => (
+                    <div
+                      key={i}
+                      className="w-56 h-56 md:w-64 md:h-64 rounded-xl overflow-hidden border-2 border-white/20 flex items-center justify-center transition-all"
+                      style={{ background: phase === "identity" ? "#1e2a3d" : tile.bgColor }}
+                    >
+                      {phase === "identity" && (
+                        <span className="font-mono text-8xl font-bold text-white">{tile.identity}</span>
+                      )}
 
-                    {phase === "memorize" && (
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        <Shape id={tile.shape} color={tile.shapeColor} size={160} />
-                        
-                        <div className="absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
-                          <span className="font-mono text-xl font-extrabold leading-tight" style={{ color: tile.topWordColor }}>
-                            {tile.topWord}
-                          </span>
+                      {phase === "memorize" && (
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          <Shape id={tile.shape} color={tile.shapeColor} size={160} />
                           
-                          <span className="font-mono text-5xl font-extrabold leading-tight" style={{ color: tile.numberColor, textShadow: "0 0 6px rgba(0,0,0,0.9)" }}>
-                            {tile.number}
-                          </span>
-                          
-                          <span className="font-mono text-lg font-extrabold leading-tight" style={{ color: tile.bottomWordColor }}>
-                            {tile.bottomWord}
-                          </span>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center px-1 text-center">
+                            <span className="font-mono text-xl font-extrabold leading-tight" style={{ color: tile.topWordColor }}>
+                              {tile.topWord}
+                            </span>
+                            
+                            <span className="font-mono text-5xl font-extrabold leading-tight" style={{ color: tile.numberColor, textShadow: "0 0 6px rgba(0,0,0,0.9)" }}>
+                              {tile.number}
+                            </span>
+                            
+                            <span className="font-mono text-lg font-extrabold leading-tight" style={{ color: tile.bottomWordColor }}>
+                              {tile.bottomWord}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {phase === "identity" && (
                 <p className="font-mono text-lg text-white/60 tracking-wider">ЗАПОМНИ НОМЕРА ПЛИТОК…</p>
