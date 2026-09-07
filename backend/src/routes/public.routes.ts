@@ -5,6 +5,7 @@ import { getAllDroids } from "../services/droid.service.js";
 import { getAllSoldiers } from "../services/soldiers.service.js";
 import { getAllBlacklistEntries } from "../services/blacklist.service.js";
 import { getContentByKey } from "../services/content.service.js";
+import { getAllCommanders } from "../services/commander.service.js";
 
 const router = Router();
 
@@ -44,6 +45,16 @@ router.get("/zergs", async (_req, res) => {
 
 router.get("/droids", async (_req, res) => {
   res.json(await getAllDroids());
+});
+
+router.get("/commanders", async (req, res) => {
+    try {
+        const commanders = await getAllCommanders();
+        res.json(commanders);
+    } catch (error) {
+        console.error("Ошибка при получении командиров:", error);
+        res.status(500).json({ error: "Внутренняя ошибка сервера" });
+    }
 });
 
 export default router;
