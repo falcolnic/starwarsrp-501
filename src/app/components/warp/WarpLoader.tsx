@@ -22,18 +22,32 @@ const CONFIG = {
     maxDPR: 2,
     trailFade: 0.35,
     parallax: 0.05,
-    glowParallax: 1, // how much further the core/halo swings vs the star trails on mouse move
+    glowParallax: 1,
     starColor: "178, 204, 249",
 };
+
+const TIPS = [
+    "Помни, боец: клоны не сдаются. Дисциплина — залог победы.",
+    "Следи за приказами командира и держи визор чистым.",
+    "Республика рассчитывает на 501-й легион. Не подведи братьев.",
+    "Бластер — твой лучший друг. Не забывай проверять охлаждение.",
+    "В случае красного кода, соблюдай радиомолчание и жди приказов.",
+    "Хороший солдат выполняет приказы. Отличный солдат знает, когда их выполнять.",
+    "Внимательность на посту спасает жизни целому взводу.",
+    "Дроиды предсказуемы. Используй тактику и нестандартное мышление.",
+];
 
 export function WarpLoader({ progress, minDuration = 3000, onDone }: WarpLoaderProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const flashRef = useRef<HTMLDivElement>(null);
 
-    const [status, setStatus] = useState("Initializing...");
+    const [status, setStatus] = useState("Инициализация систем...");
     const [hidden, setHidden] = useState(false);
     const [removed, setRemoved] = useState(false);
     const [internalProgress, setInternalProgress] = useState(0);
+    
+    // Pick a random tip on mount
+    const [advice] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)]);
 
     const isControlled = progress !== undefined;
     const displayedProgress = isControlled ? progress! : internalProgress;
@@ -46,7 +60,7 @@ export function WarpLoader({ progress, minDuration = 3000, onDone }: WarpLoaderP
         cy: 0,
         speed: CONFIG.baseSpeed,
         target: CONFIG.baseSpeed,
-        glow: 0, // smoothed 0..1 value driving the core/halo glow
+        glow: 0,
         stars: [] as Star[],
         raf: 0,
         startTime: 0,
@@ -90,121 +104,107 @@ export function WarpLoader({ progress, minDuration = 3000, onDone }: WarpLoaderP
         resize();
         st.stars = Array.from({ length: CONFIG.starCount }, () => spawn({} as Star));
         st.startTime = performance.now();
-        setStatus("Engaging warp drive...");
+        setStatus("Запуск гипердвигателя...");
 
         const onMove = (e: MouseEvent) => {
-        const r = canvas.getBoundingClientRect();
-        st.mx = ((e.clientX - r.left) / r.width) * 2 - 1;
-        st.my = ((e.clientY - r.top) / r.height) * 2 - 1;
+            const r = canvas.getBoundingClientRect();
+            st.mx = ((e.clientX - r.left) / r.width) * 2 - 1;
+            st.my = ((e.clientY - r.top) / r.height) * 2 - 1;
         };
 
         window.addEventListener("resize", resize);
         window.addEventListener("mousemove", onMove);
 
         if (!reduce) {
-        st.target = CONFIG.warpSpeed;
+            st.target = CONFIG.warpSpeed;
 
-        const frame = () => {
-            ctx.fillStyle = `rgba(0,0,0,${CONFIG.trailFade})`;
-            ctx.fillRect(0, 0, st.W, st.H);
+            const frame = () => {
+                ctx.fillStyle = `rgba(0,0,0,${CONFIG.trailFade})`;
+                ctx.fillRect(0, 0, st.W, st.H);
 
-            st.speed += (st.target - st.speed) * 0.06;
-            st.ox += (st.mx * st.W * CONFIG.parallax - st.ox) * 0.06;
-            st.oy += (st.my * st.W * CONFIG.parallax - st.oy) * 0.06;
-            const ccx = st.cx + st.ox;
-            const ccy = st.cy + st.oy;
+                st.speed += (st.target - st.speed) * 0.06;
+                st.ox += (st.mx * st.W * CONFIG.parallax - st.ox) * 0.06;
+                st.oy += (st.my * st.W * CONFIG.parallax - st.oy) * 0.06;
+                const ccx = st.cx + st.ox;
+                const ccy = st.cy + st.oy;
 
-            for (const s of st.stars) {
-            s.pz = s.z;
-            s.z -= st.speed * 22;
-            if (s.z < 1) {
-                spawn(s);
-                s.z = st.W;
-                s.pz = st.W;
-            }
+                for (const s of st.stars) {
+                    s.pz = s.z;
+                    s.z -= st.speed * 22;
+                    if (s.z < 1) {
+                        spawn(s);
+                        s.z = st.W;
+                        s.pz = st.W;
+                    }
 
-            const sx = ccx + (s.x / s.z) * st.W;
-            const sy = ccy + (s.y / s.z) * st.W;
-            const px = ccx + (s.x / s.pz) * st.W;
-            const py = ccy + (s.y / s.pz) * st.W;
-            const depth = 1 - s.z / st.W;
+                    const sx = ccx + (s.x / s.z) * st.W;
+                    const sy = ccy + (s.y / s.z) * st.W;
+                    const px = ccx + (s.x / s.pz) * st.W;
+                    const py = ccy + (s.y / s.pz) * st.W;
+                    const depth = 1 - s.z / st.W;
 
-            ctx.strokeStyle = `rgba(${CONFIG.starColor},${Math.min(1, depth + 0.2)})`;
-            ctx.lineWidth = Math.max(0.5, depth * 2.2 + DPR);
-            ctx.beginPath();
-            ctx.moveTo(px, py);
-            ctx.lineTo(sx, sy);
-            ctx.stroke();
-            }
+                    ctx.strokeStyle = `rgba(${CONFIG.starColor},${Math.min(1, depth + 0.2)})`;
+                    ctx.lineWidth = Math.max(0.5, depth * 2.2 + DPR);
+                    ctx.beginPath();
+                    ctx.moveTo(px, py);
+                    ctx.lineTo(sx, sy);
+                    ctx.stroke();
+                }
 
-            // --- glowing core at the vanishing point ---
-            // 0 while cruising at warpSpeed, ramps toward 1 as speed approaches jumpSpeed
-            const targetGlowT = Math.max(
-                0,
-                Math.min(1, (st.speed - CONFIG.warpSpeed) / (CONFIG.jumpSpeed - CONFIG.warpSpeed))
-            );
-            // smooth glow independently (slower than speed) so its size doesn't jitter/track every frame
-            st.glow += (targetGlowT - st.glow) * 0.015;
+                const targetGlowT = Math.max(
+                    0,
+                    Math.min(1, (st.speed - CONFIG.warpSpeed) / (CONFIG.jumpSpeed - CONFIG.warpSpeed))
+                );
+                
+                st.glow += (targetGlowT - st.glow) * 0.015;
 
-            if (st.glow > 0.001) {
-            const glowT = st.glow;
+                if (st.glow > 0.001) {
+                    const glowT = st.glow;
+                    const gcx = st.cx + st.ox * CONFIG.glowParallax;
+                    const gcy = st.cy + st.oy * CONFIG.glowParallax;
+                    const minDim = Math.min(st.W, st.H);
+                    const R = minDim * (0.05 + glowT * 0.17);
 
-            // glow gets its own amplified offset so it swings a bit more than the
-            // star trails with the mouse, independent of the subtler star parallax
-            const gcx = st.cx + st.ox * CONFIG.glowParallax;
-            const gcy = st.cy + st.oy * CONFIG.glowParallax;
+                    ctx.globalCompositeOperation = "lighter";
 
-            // size as a % of the smaller screen dimension, so it can never wash out
-            // the whole canvas regardless of viewport size / DPR
-            const minDim = Math.min(st.W, st.H);
-            const R = minDim * (0.05 + glowT * 0.17);
+                    const glowGrad = ctx.createRadialGradient(gcx, gcy, 0, gcx, gcy, R);
+                    const stops = 24;
+                    for (let i = 0; i <= stops; i++) {
+                        const t = Math.pow(i / stops, 1.8);
+                        const r = Math.round(255 - 65 * t);
+                        const g = Math.round(255 - 43 * t);
+                        const b = 255;
+                        const alpha = glowT * Math.pow(1 - t, 3.2) * 0.95;
+                        glowGrad.addColorStop(t, `rgba(${r},${g},${b},${alpha})`);
+                    }
+                    ctx.fillStyle = glowGrad;
+                    ctx.beginPath();
+                    ctx.arc(gcx, gcy, R, 0, Math.PI * 2);
+                    ctx.fill();
 
-            ctx.globalCompositeOperation = "lighter";
+                    ctx.globalCompositeOperation = "source-over";
+                }
 
-            // ONE continuous gradient instead of two separate circles.
-            // Stops are biased toward the center (t = (i/N)^1.8) so there's fine
-            // resolution near the core -> smooth hot center that melts into the
-            // halo with no seam/ring, then decays fully to 0 by the edge.
-            const glowGrad = ctx.createRadialGradient(gcx, gcy, 0, gcx, gcy, R);
-            const stops = 24;
-            for (let i = 0; i <= stops; i++) {
-                const t = Math.pow(i / stops, 1.8);
-                // color drifts from pure white at the core to a cool blue-white out at the edge
-                const r = Math.round(255 - 65 * t);
-                const g = Math.round(255 - 43 * t);
-                const b = 255;
-                const alpha = glowT * Math.pow(1 - t, 3.2) * 0.95;
-                glowGrad.addColorStop(t, `rgba(${r},${g},${b},${alpha})`);
-            }
-            ctx.fillStyle = glowGrad;
-            ctx.beginPath();
-            ctx.arc(gcx, gcy, R, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.globalCompositeOperation = "source-over";
-            }
-            // --- end glow ---
-
+                st.raf = requestAnimationFrame(frame);
+            };
             st.raf = requestAnimationFrame(frame);
-        };
-        st.raf = requestAnimationFrame(frame);
         }
 
         return () => {
-        cancelAnimationFrame(state.current.raf);
-        window.removeEventListener("resize", resize);
-        window.removeEventListener("mousemove", onMove);
+            cancelAnimationFrame(state.current.raf);
+            window.removeEventListener("resize", resize);
+            window.removeEventListener("mousemove", onMove);
         };
     }, [resize, spawn]);
 
     useEffect(() => {
         if (isControlled) return;
         const t = setInterval(() => {
-        setInternalProgress((p) => {
-            const next = Math.min(100, p + Math.random() * 10);
-            if (next >= 100) clearInterval(t);
-            return next;
-        });
+            setInternalProgress((p) => {
+                const next = Math.min(100, p + Math.random() * 10);
+                if (next >= 100) clearInterval(t);
+                return next;
+            });
         }, 160);
         return () => clearInterval(t);
     }, [isControlled]);
@@ -225,60 +225,74 @@ export function WarpLoader({ progress, minDuration = 3000, onDone }: WarpLoaderP
 
         const st = state.current;
         const wait = Math.max(0, minDuration - (performance.now() - st.startTime));
-        setStatus(wait > 0 ? "Stabilizing warp drive..." : "Jump complete.");
+        setStatus(wait > 0 ? "Стабилизация гипердвигателя..." : "Прыжок завершен.");
 
         const timeouts: ReturnType<typeof setTimeout>[] = [];
 
         timeouts.push(
-        setTimeout(() => {
-            setStatus("Jump complete.");
-            st.target = CONFIG.jumpSpeed;
-
-            timeouts.push(setTimeout(flashPulse, Math.max(0, CONFIG.jumpDuration - 700)));
-
-            timeouts.push(
             setTimeout(() => {
-                setHidden(true);
+                setStatus("Прыжок завершен.");
+                st.target = CONFIG.jumpSpeed;
+
+                timeouts.push(setTimeout(flashPulse, Math.max(0, CONFIG.jumpDuration - 700)));
+
                 timeouts.push(
-                setTimeout(() => {
-                    setRemoved(true);
-                    onDone?.();
-                }, 750)
+                    setTimeout(() => {
+                        setHidden(true);
+                        timeouts.push(
+                            setTimeout(() => {
+                                setRemoved(true);
+                                onDone?.();
+                            }, 750)
+                        );
+                    }, CONFIG.jumpDuration)
                 );
-            }, CONFIG.jumpDuration)
-            );
-        }, wait)
+            }, wait)
         );
 
         return () => timeouts.forEach(clearTimeout);
     }, [displayedProgress, minDuration, flashPulse, onDone]);
 
-    if (removed) return null;
+if (removed) return null;
 
     return (
         <div
-        role="progressbar"
-        aria-label="Loading"
-        aria-live="polite"
-        aria-valuenow={pct}
-        className={`fixed inset-0 z-99 bg-black overflow-hidden transition-opacity duration-200 ease-out ${
-            hidden ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
+            role="progressbar"
+            aria-label="Loading"
+            aria-live="polite"
+            aria-valuenow={pct}
+            className={`fixed inset-0 z-[999] bg-black overflow-hidden transition-opacity duration-200 ease-out ${
+                hidden ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}
         >
-        <canvas ref={canvasRef} className="block w-full h-full" />
-        <div ref={flashRef} className="absolute inset-0 bg-white opacity-0 pointer-events-none" />
-        <div className="absolute left-0 right-0 bottom-0 px-[22px] py-[18px] font-mono text-[#cfe0ff] tracking-[0.08em] uppercase">
-            <div className="flex justify-between mb-2">
-            <span>{status}</span>
-            <span>{pct}%</span>
+            <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />
+            <div ref={flashRef} className="absolute inset-0 bg-white opacity-0 pointer-events-none z-20" />
+            <div className="absolute inset-0 z-30 flex flex-col pointer-events-none">
+                <div className="flex-1 flex items-end justify-center px-6 pb-10 md:pb-1 overflow-hidden">
+                    <div 
+                        className="font-[var(--font-display)] text-[#FFE81F] text-sm md:text-base lg:text-lg text-center uppercase tracking-[0.2em] leading-loose max-w-2xl opacity-90"
+                        style={{ 
+                            transform: "perspective(300px) rotateX(15deg)",
+                            textShadow: "0 1px 0 #a89914, 0 2px 0 #877a10, 0 3px 0 #635a0c, 0 10px 15px rgba(255, 232, 31, 0.6)"
+                        }}
+                    >
+                        {advice}
+                    </div>
+                </div>
+
+                <div className="w-full px-[22px] py-[18px] font-mono text-[#cfe0ff] tracking-[0.08em] uppercase shrink-0 bg-gradient-to-t from-black/80 to-transparent">
+                    <div className="flex justify-between mb-2 text-xs md:text-sm">
+                        <span>{status}</span>
+                        <span>{pct}%</span>
+                    </div>
+                    <div className="h-[3px] rounded-full overflow-hidden bg-[rgba(120,150,220,0.25)]">
+                        <div
+                            className="h-full bg-[#78a0ff] transition-[width] duration-200 ease-out"
+                            style={{ width: `${pct}%` }}
+                        />
+                    </div>
+                </div>
             </div>
-            <div className="h-[3px] rounded-full overflow-hidden bg-[rgba(120,150,220,0.25)]">
-            <div
-                className="h-full bg-[#78a0ff] transition-[width] duration-200 ease-out"
-                style={{ width: `${pct}%` }}
-            />
-            </div>
-        </div>
         </div>
     );
 }
