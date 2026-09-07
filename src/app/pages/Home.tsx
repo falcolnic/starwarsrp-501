@@ -11,17 +11,20 @@ import { useHomeTabs } from "../../data/homeTabs";
 import { GlitchText } from "../components/GlitchText";
 import { InfoTicker } from "../components/ui/InfoTicker";
 import { BlacklistModal } from "../components/BlackListModal";
+import { CantinaHackModal } from "../components/modal/CantinaOrderRushModal";
 
 export function Home() {
   const subtitleText = "БЫСТРЫЙ ШТУРМ · ОГНЕВОЕ ПРЕВОСХОДСТВО · АБСОЛЮТНАЯ ДИСЦИПЛИНА";
+
   const { displayed, done } = useTypewriter(subtitleText, 26, 900);
   const { tabs, loading } = useHomeTabs();
   const welcomeRef = useEntrance(0);
   const tabsLabelRef = useEntrance(0);
-
+  
   const heroRef = useRef<HTMLDivElement>(null);
   
   const [isBlacklistOpen, setIsBlacklistOpen] = useState(false);
+  const [isRushOpen, setIsRushOpen] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!heroRef.current) return;
@@ -48,6 +51,11 @@ export function Home() {
           <div
             onClick={() => setIsBlacklistOpen(true)}
             className="absolute bottom-[-9%] left-[-7%] w-[30%] h-[25%] rotate-65 cursor-pointer group/folder z-20"
+          >
+            <div className="absolute inset-0 border-transparent rounded transition-all shadow-[0_0_0px_rgba(239,68,68,0)] group-hover/folder:shadow-[0_0_15px_rgba(239,68,68,0.25)]" />
+          </div>
+          <div onClick={() => setIsRushOpen(true)}
+            className="absolute bottom-[48%] right-[0%] w-[7%] h-[37%] cursor-pointer group/folder z-20"
           >
             <div className="absolute inset-0 border-transparent rounded transition-all shadow-[0_0_0px_rgba(239,68,68,0)] group-hover/folder:shadow-[0_0_15px_rgba(239,68,68,0.25)]" />
           </div>
@@ -164,6 +172,12 @@ export function Home() {
       </div>
 
       <BlacklistModal isOpen={isBlacklistOpen} onClose={() => setIsBlacklistOpen(false)} />
+      <CantinaHackModal
+        isOpen={isRushOpen}
+        onClose={() => setIsRushOpen(false)}
+        backgroundSrc="/cantina-bg.png"
+        musicSrc="/audio/cantina-band.mp3"
+      />
     </div>
   );
 }
