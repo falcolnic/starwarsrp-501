@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Save, CheckCircle, AlertTriangle, FileText, Sword, Code2, Archive, ShieldHalf, Radio } from "lucide-react";
+import { Save, CheckCircle, AlertTriangle, FileText, Sword, Code2, Archive, ShieldHalf, Radio, Briefcase } from "lucide-react";
 
 const CONTENT_TABS = [
     { key: "oath_text", label: "Присяга", icon: <Sword size={16} /> },
@@ -8,6 +8,7 @@ const CONTENT_TABS = [
     { key: "tab_documents", label: "Документы", icon: <Archive size={16} /> },
     { key: "tab_equipment", label: "Снаряжение бойца", icon: <ShieldHalf size={16} /> },
     { key: "tab_radio", label: "Регламент рации", icon: <Radio size={16} />,hint: "HTML разметка для правил радиообмена." },
+    { key: "tab_positions", label: "Должности", icon: <Briefcase size={16} />,hint: "ВНИМАНИЕ: Это должен быть валидный JSON массив отделов! Не нарушайте структуру скобок." },
 ];
 
 export function AdminContentPage() {
