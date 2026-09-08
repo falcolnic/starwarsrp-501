@@ -50,15 +50,13 @@ interface TileAttrs {
   bottomWordColor: string;
 }
 
-type QuestionKind = "shape" | "numberColor";
-
 const START_LIVES = 3;
 const IDENTITY_MS = 3000; 
-const BASE_MEMORIZE_MS = 9500; 
+const BASE_MEMORIZE_MS = 14000; 
 const MIN_MEMORIZE_MS = 3000; 
-const BASE_ANSWER_MS = 7800; 
+const BASE_ANSWER_MS = 11000; 
 const MIN_ANSWER_MS = 3000; 
-const DIFFICULTY_STEP = 400;
+const DIFFICULTY_STEP = 700;
 const BEST_SCORE_KEY = "gar501_hack_best";
 
 function randomFrom<T>(arr: readonly T[]): T {
