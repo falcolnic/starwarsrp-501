@@ -1,9 +1,9 @@
 {
     "rewrites": [
-        {
-        "source": "/((?!api/|.*\\..*).*)",
-        "destination": "/index.html"
-        }
+        { "source": "/api/ngg", "destination": "/api/ngg" },
+        { "source": "/api/cron/:match*", "destination": "/api/cron/:match*" },
+        { "source": "/api/(.*)", "destination": "/api/index" },
+        { "source": "/((?!api/|.*\\..*).*)", "destination": "/index.html" }
     ],
     "crons": [
         {
