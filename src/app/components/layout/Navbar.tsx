@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
-import { Menu, X, Home, Users, TrendingUp, ShieldAlert, Map } from "lucide-react";
+import { Menu, X, Home, Users, TrendingUp, ShieldAlert, Map, Activity } from "lucide-react";
 import { Logo } from "../ui/Logo";
 import { navLinks } from "./navLinks";
 import { MobileMenu } from "./MobileMenu";
@@ -9,6 +9,7 @@ const getNavIcon = (to: string) => {
     if (to === "/") return <Home size={24} />;
     if (to === "/roster") return <Users size={24} />;
     if (to === "/promotion") return <TrendingUp size={24} />;
+    if (to === "/stats") return <Activity size={24} />;
     if (to === "/blacklist") return <ShieldAlert size={24} />;
     return <Map size={24} />;
 };

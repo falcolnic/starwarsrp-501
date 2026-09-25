@@ -30,8 +30,7 @@ export function Promotion() {
   const [loading, setLoading] = useState(true);
   const [selectedCid, setSelectedCid] = useState<string>("");
   const [dropOpen, setDropOpen] = useState(false);
-  
-  // NEW: Search query state
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const { ranks, loading: ranksLoading } = useRanks();
@@ -72,7 +71,6 @@ export function Promotion() {
   const completedCount = requirements.filter((r) => r.completed).length;
   const overallPct = requirements.length > 0 ? Math.round((completedCount / requirements.length) * 100) : 100;
 
-  // NEW: Filter soldiers based on search query
   const filteredSoldiers = soldiers.filter((s) => {
     const query = searchQuery.toLowerCase();
     const cs = (s.callsignOverride || s.nickname || "").toLowerCase();
@@ -121,7 +119,7 @@ export function Promotion() {
           <button
             onClick={() => {
               setDropOpen((o) => !o);
-              if (!dropOpen) setSearchQuery(""); // Reset search when opening
+              if (!dropOpen) setSearchQuery("");
             }}
             className="w-full flex items-center justify-between gap-3 px-4 py-2.5 bg-[#0d1829] border border-[var(--border)] text-white cursor-pointer rounded hover:border-[var(--primary)] transition-all duration-150"
           >
@@ -139,7 +137,6 @@ export function Promotion() {
 
           {dropOpen && (
             <div className="absolute top-[105%] left-0 right-0 bg-[#0d1829] border border-[var(--border)] rounded shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex flex-col z-50">
-              {/* SEARCH INPUT BAR */}
               <div className="p-2 border-b border-[var(--border)]/50 bg-[#080d17]">
                 <div className="relative flex items-center">
                   <Search size={14} className="absolute left-3 text-[var(--muted-foreground)]" />
@@ -154,7 +151,6 @@ export function Promotion() {
                 </div>
               </div>
 
-              {/* LIST BODY */}
               <div className="max-h-64 overflow-y-auto">
                 {filteredSoldiers.length > 0 ? (
                   filteredSoldiers.map((s) => {

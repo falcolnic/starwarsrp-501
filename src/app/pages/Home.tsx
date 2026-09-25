@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router";
-import { ChevronDown, Users, TrendingUp } from "lucide-react";
+import { ChevronDown, Users, TrendingUp, FileText } from "lucide-react";
 
 import { useEntrance } from "../../hooks/useEntrance";
 import { useTypewriter } from "../../hooks/useTypewriter";
@@ -113,6 +113,7 @@ export function Home() {
           </div>
 
           <div className="anim-fade-up flex gap-9 mt-12 flex-wrap justify-center [animation-delay:400ms]">
+
             <div className="relative group/btn1 overflow-visible">
               <span className="absolute -top-1 -left-1 w-3.5 h-3.5 border-t-2 border-l-2 border-[#3D6FC4] pointer-events-none opacity-0 -translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn1:translate-x-0 group-hover/btn1:translate-y-0 group-hover/btn1:opacity-100" />
               <span className="absolute -top-1 -right-1 w-3.5 h-3.5 border-t-2 border-r-2 border-[#3D6FC4] pointer-events-none opacity-0 translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn1:translate-x-0 group-hover/btn1:translate-y-0 group-hover/btn1:opacity-100" />
@@ -132,6 +133,17 @@ export function Home() {
                 <HudButton icon={<TrendingUp size={24} />} label="ТРЕКЕР ПОВЫШЕНИЙ" />
               </Link>
             </div>
+
+            <div className="relative group/btn3 overflow-visible">
+              <span className="absolute -top-1 -left-1 w-3.5 h-3.5 border-t-2 border-l-2 border-[#3D6FC4] pointer-events-none opacity-0 -translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn3:translate-x-0 group-hover/btn3:translate-y-0 group-hover/btn3:opacity-100" />
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 border-t-2 border-r-2 border-[#3D6FC4] pointer-events-none opacity-0 translate-x-2 -translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn3:translate-x-0 group-hover/btn3:translate-y-0 group-hover/btn3:opacity-100" />
+              <span className="absolute -bottom-1 -left-1 w-3.5 h-3.5 border-b-2 border-l-2 border-[#3D6FC4] pointer-events-none opacity-0 -translate-x-2 translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn3:translate-x-0 group-hover/btn3:translate-y-0 group-hover/btn3:opacity-100" />
+              <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-b-2 border-r-2 border-[#3D6FC4] pointer-events-none opacity-0 translate-x-2 translate-y-2 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn3:translate-x-0 group-hover/btn3:translate-y-0 group-hover/btn3:opacity-100" />
+              <Link to="/charter" className="no-underline block">
+                <HudButton icon={<FileText size={24} />} label="УСТАВ 501-ГО Э.Ш.Л." />
+              </Link>
+            </div>
+
           </div>
         </div>
 
@@ -167,7 +179,6 @@ export function Home() {
 
         <SectionDecor />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Main feature cards stay the same */}
         </div>
       </div>
 

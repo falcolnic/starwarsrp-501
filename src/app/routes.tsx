@@ -6,6 +6,7 @@ import rosterRaw from "../data/roster.json";
 import { Home } from "./pages/Home";
 import { Roster } from "./pages/Roster";
 import { Promotion } from "./pages/Promotion";
+import { Stats } from "./pages/Stats";
 import { MapViewer } from "./components/map/MapViewer";
 import { Zergs } from "./pages/Zergs";
 import { Droids } from "./pages/Droids";
@@ -93,6 +94,7 @@ export const router = createBrowserRouter([
       { path: "roster", Component: Roster },
       { path: "promotion", Component: Promotion },
       { path: "promotion/rules", Component: PromotionRulesPage },
+      { path: "stats", Component: Stats },
       { path: "map", Component: MapViewer },
       { path: "commanders", Component: Commanders },
       { path: "positions", Component: Positions },
