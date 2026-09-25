@@ -5,6 +5,7 @@ import rosterRaw from "../data/roster.json";
 
 import { Home } from "./pages/Home";
 import { Roster } from "./pages/Roster";
+import { CharterPage } from "./pages/Charter";
 import { Promotion } from "./pages/Promotion";
 import { Stats } from "./pages/Stats";
 import { MapViewer } from "./components/map/MapViewer";
@@ -93,6 +94,7 @@ export const router = createBrowserRouter([
       { index: true, Component: Home },
       { path: "roster", Component: Roster },
       { path: "promotion", Component: Promotion },
+      { path: "charter", Component: CharterPage },
       { path: "promotion/rules", Component: PromotionRulesPage },
       { path: "stats", Component: Stats },
       { path: "map", Component: MapViewer },
